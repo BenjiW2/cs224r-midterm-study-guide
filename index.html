@@ -1062,6 +1062,66 @@ compute how to make its sampled actions more likely: grad log probability
 multiply by how good it was: return
 update θ in that direction</div>
 
+        <div class="worked">
+          <h4>Worked Update: Actually Move The Probability</h4>
+          <p>
+            For teaching only, pretend we update <code>p = p(right)</code> directly. Real policies usually update
+            <code>θ</code>, the neural-net weights, and then <code>p(right)</code> changes because the weights changed.
+          </p>
+          <div class="formula">p ← p + η · G · derivative_of_log_probability_of_sampled_action</div>
+          <p>
+            Start with <code>p = p(right) = 0.30</code>, so <code>p(left) = 0.70</code>. Use learning rate
+            <code>η = 0.005</code>. Here <code>G</code> is the return from the sampled rollout.
+          </p>
+          <table>
+            <thead>
+              <tr>
+                <th>Sampled action</th>
+                <th>Return</th>
+                <th>Derivative</th>
+                <th>Update to <code>p(right)</code></th>
+                <th>New <code>p(right)</code></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>right</code></td>
+                <td><code>G = +10</code></td>
+                <td><code>1 / p = 1 / 0.30 = 3.33</code></td>
+                <td><code>0.005 · 10 · 3.33 = +0.167</code></td>
+                <td><code>0.30 + 0.167 = 0.467</code></td>
+              </tr>
+              <tr>
+                <td><code>left</code></td>
+                <td><code>G = +10</code></td>
+                <td><code>-1 / (1 - p) = -1 / 0.70 = -1.43</code></td>
+                <td><code>0.005 · 10 · -1.43 = -0.071</code></td>
+                <td><code>0.30 - 0.071 = 0.229</code></td>
+              </tr>
+              <tr>
+                <td><code>right</code></td>
+                <td><code>G = -10</code></td>
+                <td><code>1 / p = 3.33</code></td>
+                <td><code>0.005 · -10 · 3.33 = -0.167</code></td>
+                <td><code>0.30 - 0.167 = 0.133</code></td>
+              </tr>
+              <tr>
+                <td><code>left</code></td>
+                <td><code>G = -10</code></td>
+                <td><code>-1 / (1 - p) = -1.43</code></td>
+                <td><code>0.005 · -10 · -1.43 = +0.071</code></td>
+                <td><code>0.30 + 0.071 = 0.371</code></td>
+              </tr>
+            </tbody>
+          </table>
+          <p>
+            Read the table by sign. Positive return reinforces the sampled action. Negative return punishes the
+            sampled action. If the sampled action was <code>left</code>, reinforcing <code>left</code> means
+            lowering <code>p(right)</code>, because this toy policy only has two actions. In actor-critic methods,
+            replace <code>G</code> with advantage <code>A = G - baseline</code>, but the logic is the same.
+          </p>
+        </div>
+
         <h4>Why Logs Specifically?</h4>
         <p>
           A rollout probability is a product of action probabilities:
