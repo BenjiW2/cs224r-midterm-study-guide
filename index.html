@@ -1527,6 +1527,13 @@ r'(s,a,s') = r(s,a,s') + gamma Phi(s') - Phi(s)
 
 Intuition:
 the shaping terms telescope over time, so they guide learning without changing which full trajectories are optimal.</div>
+        <div class="note">
+          <strong>What this equation is used for:</strong> it defines a new training reward
+          <span class="math-inline">r'</span>. Instead of training only on the original reward
+          <span class="math-inline">r</span>, we train on <span class="math-inline">r'</span>, which adds a hint
+          for moving toward promising states. The goal is faster learning without changing which final behavior is
+          optimal.
+        </div>
         <div class="worked">
           <h4>What The Formula Is Doing</h4>
           <p>
