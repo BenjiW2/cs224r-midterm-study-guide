@@ -1648,6 +1648,19 @@ gamma Phi(s_2) - Phi(s_1)</div>
         </p>
         <div class="formula">Behavior cloning objective:
 min_theta E_{(s,a) ~ D_expert}[-log pi_theta(a | s)]</div>
+        <div class="worked">
+          <h4>Read This Formula</h4>
+          <div class="component-list">
+            <div><strong>D<sub>expert</sub></strong><span>The dataset of expert examples.</span></div>
+            <div><strong>(s,a) ~ D<sub>expert</sub></strong><span>Pick an expert state-action pair from the dataset.</span></div>
+            <div><strong>π<sub>θ</sub>(a | s)</strong><span>The policy's probability of the expert action in that state.</span></div>
+            <div><strong>-log π<sub>θ</sub>(a | s)</strong><span>Loss is small if the expert action has high probability, large if it has low probability.</span></div>
+          </div>
+          <p>
+            Plain English: show the model what the expert did, and adjust <span class="math-inline">θ</span> so
+            those expert actions become more likely. This is just classification when actions are discrete.
+          </p>
+        </div>
         <p>
           If actions are continuous and the policy is Gaussian, this often looks like squared-error regression.
           If actions are discrete, it looks like cross-entropy classification.
@@ -1676,6 +1689,24 @@ a_{t,tau + 1/n} = a_{t,tau} + (1/n) v_theta(s_t, a_{t,tau}, tau)
 Flow matching loss:
 L_FM(theta) = (1/|D|) sum_{(s_t,a_t) in D}
   || v_theta(s_t, a_{t,tau}, tau) - (a_t - a_{t,0}) ||_2^2</div>
+        <div class="worked">
+          <h4>Flow Matching In Plain English</h4>
+          <p>
+            Do not read this as ordinary time in the environment. The extra variable <span class="math-inline">τ</span>
+            is a fake generation-time coordinate: start with random noise, then repeatedly move it toward a real
+            expert action.
+          </p>
+          <div class="component-list">
+            <div><strong>a<sub>t,0</sub></strong><span>A noisy initial action sample.</span></div>
+            <div><strong>a<sub>t</sub></strong><span>The real expert action we want to generate.</span></div>
+            <div><strong>v<sub>θ</sub>(...)</strong><span>A learned velocity: which direction should the current action sample move?</span></div>
+            <div><strong>Euler step</strong><span>Take many small steps from noise toward a realistic action.</span></div>
+          </div>
+          <p>
+            Exam-level takeaway: flow matching is an expressive policy model for multimodal actions. It avoids
+            averaging "go left" and "go right" into a bad middle action.
+          </p>
+        </div>
 
         <h3>Compounding Errors</h3>
         <p>
@@ -1716,6 +1747,19 @@ grad_theta J(theta) =
 E_{tau ~ p_theta(tau)}[
   (sum_t grad_theta log pi_theta(a_t | s_t)) (sum_t r_t)
 ]</div>
+        <div class="worked">
+          <h4>Read REINFORCE As A Training Rule</h4>
+          <div class="component-list">
+            <div><strong>Σ<sub>t</sub> ∇ log π<sub>θ</sub>(a<sub>t</sub>|s<sub>t</sub>)</strong><span>For every sampled action, compute how to change the policy to make that action more likely.</span></div>
+            <div><strong>Σ<sub>t</sub> r<sub>t</sub></strong><span>The total return of that rollout.</span></div>
+            <div><strong>Multiply them</strong><span>Good rollout: reinforce its actions. Bad rollout: push against them.</span></div>
+            <div><strong>E[ ... ]</strong><span>Average this over many sampled rollouts.</span></div>
+          </div>
+          <p>
+            This formula is the formal version of: try actions, score the rollout, then make the actions from
+            high-return rollouts more likely.
+          </p>
+        </div>
 
         <h3>Why The Dynamics Disappear</h3>
         <p>
@@ -1727,6 +1771,11 @@ E_{tau ~ p_theta(tau)}[
           Therefore, their gradients are zero. The policy-gradient estimator only needs
           <code>grad log pi_theta(a_t | s_t)</code>.
         </p>
+        <div class="note">
+          <strong>Careful:</strong> the environment dynamics still affect which trajectories and rewards you see.
+          They "disappear" only from the derivative with respect to policy parameters <span class="math-inline">θ</span>,
+          because changing the policy weights does not directly change the physics of the environment.
+        </div>
 
         <h3>Causality: Reward-To-Go</h3>
         <p>
@@ -1740,6 +1789,14 @@ E[
   (sum_{t' = t}^T r_{t'} - b)
 ]</div>
         <p>This keeps the expected gradient correct and usually reduces variance.</p>
+        <div class="worked">
+          <h4>Why Reward-To-Go Makes Sense</h4>
+          <p>
+            If action <span class="math-inline">a<sub>5</sub></span> happened at time 5, it cannot have caused
+            rewards at times 1 through 4. So crediting <span class="math-inline">a<sub>5</sub></span> with earlier
+            rewards only adds noise. Reward-to-go gives an action credit only for rewards from that time onward.
+          </p>
+        </div>
 
         <h3>Baselines</h3>
         <p>
@@ -1757,6 +1814,14 @@ E_{a ~ pi(.|s)}[grad log pi(a|s) b(s)]
 = b(s) sum_a grad pi(a|s)
 = b(s) grad 1
 = 0</div>
+        <div class="worked">
+          <h4>Baseline Rule You Should Memorize</h4>
+          <p>
+            A baseline may depend on the state, prompt, timestep, or anything known before sampling the action.
+            It must not depend on which action was sampled. If it only depends on the state, it subtracts the same
+            number from every action in that state, so it changes variance but not the expected gradient direction.
+          </p>
+        </div>
 
         <details class="question">
           <summary>Check: which baselines are valid: V(s_t), E_a[Q(s_t,a)], Q(s_t,a_t), or a bad neural net c(s_t)?</summary>
@@ -1819,6 +1884,16 @@ rho_t(theta') = pi_{theta'}(a_t | s_t) / pi_theta(a_t | s_t)</div>
         <div class="formula">V^pi(s) = expected future reward from state s, then follow pi
 Q^pi(s,a) = expected future reward from state s, take action a, then follow pi
 A^pi(s,a) = Q^pi(s,a) - V^pi(s)</div>
+        <div class="worked">
+          <h4>Value, Q, Advantage With Numbers</h4>
+          <p>
+            Suppose being in a state is usually worth <span class="math-inline">V(s)=5</span>. If taking action
+            <span class="math-inline">a</span> there has <span class="math-inline">Q(s,a)=8</span>, then
+            <span class="math-inline">A(s,a)=3</span>. That action was better than usual for that state, so a policy
+            gradient should increase its probability. If <span class="math-inline">Q(s,a)=2</span>, then
+            <span class="math-inline">A(s,a)=-3</span>, so decrease its probability.
+          </p>
+        </div>
         <p>
           The actor is the policy. The critic is the value or Q estimator. The actor asks, "What should I do?"
           The critic answers, "Was that action better or worse than expected?"
@@ -1827,6 +1902,10 @@ A^pi(s,a) = Q^pi(s,a) - V^pi(s)</div>
         <div class="formula">Actor-critic policy gradient:
 grad_theta J(theta) approx (1/N) sum_i sum_t
   grad_theta log pi_theta(a_{i,t} | s_{i,t}) * A_hat(s_{i,t}, a_{i,t})</div>
+        <div class="note">
+          Actor-critic is REINFORCE with a smarter score. Instead of multiplying by raw total return, multiply by
+          estimated advantage: "was this sampled action better or worse than normal in this state?"
+        </div>
 
         <h3>Estimating Values</h3>
         <table>
@@ -1858,6 +1937,15 @@ grad_theta J(theta) approx (1/N) sum_i sum_t
 
         <div class="formula">1-step advantage estimate:
 A_hat(s_t,a_t) approx r_t + gamma V_hat(s_{t+1}) - V_hat(s_t)</div>
+        <div class="worked">
+          <h4>TD Advantage Example</h4>
+          <p>
+            If <span class="math-inline">r<sub>t</sub>=1</span>, <span class="math-inline">γ=0.9</span>,
+            <span class="math-inline">V(s<sub>t+1</sub>)=10</span>, and <span class="math-inline">V(s<sub>t</sub>)=8</span>,
+            then the advantage estimate is <span class="math-inline">1 + 0.9·10 - 8 = 2</span>. Positive advantage
+            means the action was better than expected.
+          </p>
+        </div>
 
         <h3>GAE</h3>
         <p>
@@ -1890,6 +1978,15 @@ sum_{i,t} min(
           If an update would make the policy probability change too much in a way that improves the surrogate,
           clipping removes the extra incentive.
         </p>
+        <div class="worked">
+          <h4>PPO Clipping Intuition</h4>
+          <p>
+            The ratio compares the new policy to the old policy on the same sampled action. If the ratio is
+            <span class="math-inline">1.0</span>, probability did not change. If it is <span class="math-inline">1.2</span>,
+            the new policy made that action 20% more likely. PPO says: learn from the batch, but do not let one
+            update make the new policy too different from the policy that collected the data.
+          </p>
+        </div>
 
         <details class="question">
           <summary>Check: if advantage is positive, what does PPO clipping prevent?</summary>
@@ -1959,6 +2056,15 @@ Q^pi(s,a) = r(s,a) + gamma E_{s', a' ~ pi(.|s')}[Q^pi(s',a')]
 
 Bellman optimality equation:
 Q*(s,a) = r(s,a) + gamma E_{s'}[max_{a'} Q*(s',a')]</div>
+        <div class="worked">
+          <h4>Fixed Policy Versus Optimal Control</h4>
+          <p>
+            <span class="math-inline">Q<sup>π</sup></span> asks: after this action, how good is it if I keep following
+            policy <span class="math-inline">π</span>? <span class="math-inline">Q*</span> asks: after this action,
+            how good is it if I act optimally from then on? That is why the optimality equation has
+            <span class="math-inline">max<sub>a'</sub></span>.
+          </p>
+        </div>
 
         <h3>Q-Learning Target And Loss</h3>
         <div class="formula">1-step Q-learning target:
@@ -1966,6 +2072,15 @@ y_i = r_i + gamma max_{a'} Q_hat_phi(s'_i, a')
 
 Q-learning loss:
 L(phi) = (1/N) sum_i || Q_hat_phi(s_i,a_i) - y_i ||^2</div>
+        <div class="worked">
+          <h4>What Is The Target?</h4>
+          <p>
+            The target <span class="math-inline">y</span> is the label we train the Q-network to match:
+            immediate reward plus discounted estimate of the best next action. Example:
+            <span class="math-inline">r=2</span>, <span class="math-inline">γ=0.9</span>, best next Q is
+            <span class="math-inline">10</span>, so <span class="math-inline">y = 2 + 0.9·10 = 11</span>.
+          </p>
+        </div>
         <p>
           Once <code>Q_hat</code> is good, the policy is greedy:
           choose <code>argmax_a Q_hat(s,a)</code>.
@@ -2016,6 +2131,15 @@ L(phi) = (1/N) sum_i || Q_hat_phi(s_i,a_i) - y_i ||^2</div>
 y_{i,t}^{(n)} =
   sum_{t'=t}^{t+n-1} gamma^{t'-t} r_{i,t'}
   + gamma^n max_a Q_hat(s_{i,t+n}, a)</div>
+        <div class="worked">
+          <h4>n-Step Target In Words</h4>
+          <p>
+            Use the next <span class="math-inline">n</span> rewards that actually happened in the replay trajectory,
+            then bootstrap from Q at the state after those <span class="math-inline">n</span> steps. This can reduce
+            bootstrap bias, but if the replay trajectory came from an old behavior policy, those intermediate
+            actions may not match the policy you are trying to evaluate.
+          </p>
+        </div>
         <p>
           Larger <code>n</code> uses more observed rewards before bootstrapping. This reduces dependence on
           inaccurate early Q-values, but increases variance and can introduce off-policy bias.
@@ -2075,6 +2199,23 @@ y_{i,t}^{(n)} =
 max_theta E_{(s,a) ~ D}[
   log pi_theta(a | s) exp((1/alpha) A_hat(s,a))
 ]</div>
+        <div class="worked">
+          <h4>Read AWR As Weighted Behavior Cloning</h4>
+          <p>
+            AWR still imitates actions from the offline dataset. The difference is that it imitates high-advantage
+            actions more strongly.
+          </p>
+          <div class="component-list">
+            <div><strong>log π<sub>θ</sub>(a|s)</strong><span>Make the dataset action more likely.</span></div>
+            <div><strong>Â(s,a)</strong><span>Estimated advantage of that dataset action.</span></div>
+            <div><strong>exp(Â/α)</strong><span>The weight. High advantage means a large imitation weight.</span></div>
+            <div><strong>α</strong><span>Temperature controlling how aggressively high-advantage actions dominate.</span></div>
+          </div>
+          <p>
+            Key safety point: AWR never asks the policy to maximize over arbitrary unseen actions. It learns from
+            actions that are actually in the dataset.
+          </p>
+        </div>
         <p>
           Good: policy is trained only on dataset actions, so it avoids querying OOD actions. Weakness:
           basic AWR uses Monte Carlo returns, which can be high variance, and its advantages are tied to
@@ -2102,6 +2243,18 @@ Policy extraction:
 pi_hat &lt;- argmax_pi E_{(s,a)~D}[
   log pi(a|s) exp((1/alpha)(Q_hat(s,a) - V_hat(s)))
 ]</div>
+        <div class="worked">
+          <h4>IQL In Three Moves</h4>
+          <ol>
+            <li>Fit <span class="math-inline">V(s)</span> to a high-but-supported value using expectile regression.</li>
+            <li>Fit <span class="math-inline">Q(s,a)</span> using TD targets that bootstrap to <span class="math-inline">V(s')</span>, not a max over unseen actions.</li>
+            <li>Extract a policy with weighted behavior cloning, using <span class="math-inline">Q(s,a)-V(s)</span> as the advantage.</li>
+          </ol>
+          <p>
+            The point of IQL is to improve beyond the behavior policy while avoiding the dangerous offline-RL move:
+            <span class="math-inline">max<sub>a</sub> Q(s,a)</span> over actions the dataset may never contain.
+          </p>
+        </div>
 
         <div class="trap">
           <strong>Upper expectile convention in the reference sheet.</strong> The sheet says upper expectile uses
@@ -2152,6 +2305,15 @@ Reward model objective:
 max_theta E_{(tau_w,tau_l)}[
   log sigmoid(r_theta(tau_w) - r_theta(tau_l))
 ]</div>
+        <div class="worked">
+          <h4>Preference Model With Numbers</h4>
+          <p>
+            Suppose the reward model gives trajectory A score <span class="math-inline">6</span> and trajectory B
+            score <span class="math-inline">2</span>. The preference model uses the difference
+            <span class="math-inline">6 - 2 = 4</span>, then applies a sigmoid, giving high probability that A is
+            preferred. If the human preferred B, the loss pushes the reward model to lower A's score or raise B's.
+          </p>
+        </div>
 
         <h3>RLHF Pipeline</h3>
         <ol>
@@ -2168,6 +2330,11 @@ max_theta E_{(tau_w,tau_l)}[
           It turns preference data directly into a classification-style objective for the policy. The lecture frames
           it as simpler and effective, but less able to leverage online data.
         </p>
+        <div class="note">
+          DPO is still preference learning. The practical difference is where the preference signal goes: RLHF first
+          trains a reward model and then optimizes the policy against it; DPO updates the policy directly from
+          preferred-versus-rejected response pairs.
+        </div>
 
         <h3>Failure Modes</h3>
         <ul>
@@ -2234,6 +2401,14 @@ p_theta(s_{t+1} | s_t, a_t)
 
 Reward model:
 r_theta(s_t, a_t)</div>
+        <div class="worked">
+          <h4>What The Model Is For</h4>
+          <p>
+            A dynamics model predicts "if I take action <span class="math-inline">a<sub>t</sub></span> in state
+            <span class="math-inline">s<sub>t</sub></span>, what state comes next?" A reward model predicts how good
+            that imagined transition is. Together, they let the agent practice or plan in imagination.
+          </p>
+        </div>
 
         <h3>Use 1: Generate Synthetic Data</h3>
         <p>
@@ -2263,6 +2438,18 @@ i* = argmax_i [
   sum_{t'=t}^{t+H} r(s_hat^i_{t'}, a^i_{t'})
   + V_hat(s_hat^i_{t+H+1})
 ]</div>
+        <div class="worked">
+          <h4>Planning V1 Versus V2</h4>
+          <p>
+            V1 scores only rewards inside the imagined horizon. If the horizon is short, it may miss what happens
+            after the rollout ends. V2 adds a terminal value estimate, which says "after my imagined rollout stops,
+            how good is the final state likely to be?"
+          </p>
+          <p>
+            The planner executes only the first action from the best sequence, then replans. Replanning matters
+            because the real world may differ from the model's prediction.
+          </p>
+        </div>
 
         <h3>Why Greedy One-Step Reward Is Not Enough</h3>
         <p>
@@ -2300,6 +2487,15 @@ i* = argmax_i [
 pi_theta(a | s, z)
 
 where z can be a task ID, goal state, instruction, desired object, user ID, etc.</div>
+        <div class="worked">
+          <h4>What Conditioning Changes</h4>
+          <p>
+            Without <span class="math-inline">z</span>, the same state must map to one behavior. With
+            <span class="math-inline">z</span>, the policy can behave differently in the same state depending on
+            the task or goal. Example: in the same kitchen state, <span class="math-inline">z</span> might say
+            "make coffee" or "clean the counter."
+          </p>
+        </div>
 
         <h3>Why Share Across Tasks?</h3>
         <ul>
@@ -2319,6 +2515,14 @@ where z can be a task ID, goal state, instruction, desired object, user ID, etc.
           If an episode failed at its intended goal but reached some other state, relabel that reached state as
           the goal and train as if the episode succeeded for that alternate goal.
         </p>
+        <div class="worked">
+          <h4>HER Example</h4>
+          <p>
+            Intended goal: put the block at position A. The robot fails, but it puts the block at position B.
+            For the original goal, this episode is a failure. For the relabeled goal "put the block at B," the same
+            trajectory becomes a success example. This creates useful training data from failed attempts.
+          </p>
+        </div>
         <div class="note">
           Hindsight relabeling needs compatible dynamics across goals or tasks and is naturally paired with
           off-policy algorithms using a replay buffer.
