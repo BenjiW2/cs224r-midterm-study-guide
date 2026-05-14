@@ -1494,17 +1494,100 @@ J(theta) = E_{tau ~ p_theta(tau)}[sum_t r(s_t, a_t)]</div>
 
         <h3>Dense Rewards And Shaping</h3>
         <p>
-          Dense rewards can make learning much easier because they provide feedback before the terminal event.
-          But a dense progress reward is not automatically policy-preserving. It can make the agent chase local
-          progress, avoid necessary detours, or prefer risky shortcuts. The special case that is known to preserve
-          optimal policies is potential-based shaping, which adds a difference of potentials rather than an arbitrary
-          progress bonus.
+          Sparse rewards give feedback only at rare moments, like <span class="math-inline">+1</span> when the robot
+          finally reaches the goal and <span class="math-inline">0</span> everywhere else. Dense rewards give feedback
+          along the way, like "you moved closer to the goal" or "your hand is closer to the object." Dense rewards can
+          make learning much faster because the agent gets a signal before the final success or failure.
         </p>
+        <div class="component-list">
+          <div>
+            <strong>Sparse reward</strong>
+            <span>Most steps give no useful feedback. Example: <span class="math-inline">r = 0</span> until success, then <span class="math-inline">r = +1</span>.</span>
+          </div>
+          <div>
+            <strong>Dense reward</strong>
+            <span>Many steps give feedback. Example: reward the robot whenever it reduces distance to the goal.</span>
+          </div>
+          <div>
+            <strong>Reward shaping</strong>
+            <span>Changing or adding rewards to make learning easier.</span>
+          </div>
+          <div>
+            <strong>Policy-preserving</strong>
+            <span>The reward change does not change which policy is truly optimal.</span>
+          </div>
+        </div>
+        <div class="trap">
+          <strong>The danger.</strong> A dense reward is not automatically safe. If you reward "being closer to the
+          goal" at every step, the agent may learn to hover near the goal, take a shortcut, avoid a necessary detour,
+          or exploit the progress signal instead of completing the actual task.
+        </div>
         <div class="formula">Potential-based shaping idea:
 r'(s,a,s') = r(s,a,s') + gamma Phi(s') - Phi(s)
 
 Intuition:
 the shaping terms telescope over time, so they guide learning without changing which full trajectories are optimal.</div>
+        <div class="worked">
+          <h4>What The Formula Is Doing</h4>
+          <p>
+            <span class="math-inline">Φ(s)</span>, pronounced "Phi of state," is a potential function: a score you
+            assign to a state. Usually it means something like "how promising is this state?" A state closer to the
+            goal might have higher potential.
+          </p>
+          <div class="component-list">
+            <div>
+              <strong>r(s,a,s')</strong>
+              <span>The original reward from the real task.</span>
+            </div>
+            <div>
+              <strong>r'(s,a,s')</strong>
+              <span>The shaped reward used for learning.</span>
+            </div>
+            <div>
+              <strong>Φ(s)</strong>
+              <span>Potential of the current state.</span>
+            </div>
+            <div>
+              <strong>Φ(s')</strong>
+              <span>Potential of the next state.</span>
+            </div>
+            <div>
+              <strong>γΦ(s') - Φ(s)</strong>
+              <span>The shaping bonus. It rewards moving to states with higher potential, adjusted for discounting.</span>
+            </div>
+            <div>
+              <strong>γ</strong>
+              <span>The same discount factor used in the return.</span>
+            </div>
+          </div>
+          <p>
+            If the next state has much higher potential than the current state, the shaping term is positive. If the
+            next state has lower potential, it is negative. So it can guide exploration without replacing the real
+            task reward.
+          </p>
+        </div>
+        <div class="worked">
+          <h4>Why "Telescoping" Means It Is Safe</h4>
+          <p>
+            Suppose a trajectory visits states <span class="math-inline">s<sub>0</sub>, s<sub>1</sub>, s<sub>2</sub></span>.
+            The shaping rewards along the path are:
+          </p>
+          <div class="formula">Step 0 shaping:
+gamma Phi(s_1) - Phi(s_0)
+
+Step 1 shaping:
+gamma Phi(s_2) - Phi(s_1)</div>
+          <p>
+            When these are placed inside the discounted return, the middle potential terms cancel. That is what
+            "telescope" means: most internal terms disappear, leaving mainly a start-state term and an end-state
+            term. Since every policy starting from the same state gets the same start-state adjustment, the ordering
+            of full trajectories is preserved.
+          </p>
+          <p>
+            Exam translation: arbitrary dense rewards can change the real objective. Potential-based shaping is the
+            special form that gives learning hints while preserving the optimal policy.
+          </p>
+        </div>
 
         <h3>Reward Transformations</h3>
         <table>
