@@ -1146,11 +1146,16 @@ with return G = +10, update pushes p downward</div>
           its log probability and multiply by its probability. This matters because "probability times something"
           is exactly an expectation, meaning we can estimate it by sampling.
         </p>
+        <div class="note">
+          <strong>Where is the learning rate?</strong> It is not in this identity. The identity is just algebra for
+          computing a gradient. The learning rate <code>η</code> appears in the separate update step, where we decide
+          how far to move in the gradient direction.
+        </div>
         <div class="formula">Policy-gradient takeaway:
 sample a rollout
 compute how to make its sampled actions more likely: grad log probability
 multiply by how good it was: return
-update θ in that direction</div>
+update θ with a step size η in that direction</div>
 
         <div class="worked">
           <h4>Worked Update: Actually Move The Probability</h4>
