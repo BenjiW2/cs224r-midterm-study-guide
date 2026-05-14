@@ -1249,14 +1249,34 @@ log π_theta(a_1 | s_1) + log π_theta(a_2 | s_2) + ... + log π_theta(a_T | s_T
           That is why the policy-gradient formula later has a sum of
           <code>∇ log π<sub>θ</sub>(a<sub>t</sub>|s<sub>t</sub>)</code> terms.
         </p>
+        <div class="note">
+          <strong>Short answer: yes, but be precise.</strong> Logs are useful because they make the expression
+          easier to differentiate and easier to estimate from sampled rollouts. They do not change what action
+          was sampled or what reward was received; they change the math we use to update the policy.
+        </div>
+        <div class="component-list">
+          <div>
+            <strong>Reason 1</strong>
+            <span>A trajectory probability is a product. Differentiating a long product is annoying; taking a log turns it into a sum.</span>
+          </div>
+          <div>
+            <strong>Reason 2</strong>
+            <span>The identity <code>∇p = p∇log p</code> lets us use sampled trajectories to estimate the gradient instead of summing over every possible trajectory.</span>
+          </div>
+        </div>
+        <p>
+          So the practical meaning is: after a rollout, we only need the log probabilities of the actions we
+          actually sampled. We add their gradients, multiply by return or advantage, and take an update step.
+        </p>
 
         <details class="question">
           <summary>Check: why do we use log probabilities instead of probabilities directly?</summary>
           <div class="answer">
             <span class="answer-label">Answer.</span>
-            Products of probabilities appear in trajectory distributions. Logs turn products into sums, so
-            <code>log p_theta(tau)</code> becomes a sum of <code>log pi_theta(a_t | s_t)</code>. Also,
-            <code>grad p = p grad log p</code> is what makes the policy-gradient estimator sampleable.
+            Yes: log probabilities make the gradient easier to compute and estimate. Products of probabilities
+            appear in trajectory distributions. Logs turn products into sums, so <code>log p_theta(tau)</code>
+            becomes a sum of <code>log pi_theta(a_t | s_t)</code>. Also, <code>grad p = p grad log p</code> is
+            what makes the policy-gradient estimator sampleable from rollouts.
           </div>
         </details>
       </section>
