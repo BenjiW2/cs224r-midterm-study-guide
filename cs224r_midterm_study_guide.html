@@ -1530,18 +1530,32 @@ the shaping terms telescope over time, so they guide learning without changing w
         <div class="worked">
           <h4>What The Formula Is Doing</h4>
           <p>
+            Here <span class="math-inline">s</span> means the current state, <span class="math-inline">a</span>
+            means the action taken, and <span class="math-inline">s'</span>, read "s prime," means the next state
+            after taking that action. So one transition looks like:
+            <span class="math-inline">s → a → s'</span>.
+          </p>
+          <p>
             <span class="math-inline">Φ(s)</span>, pronounced "Phi of state," is a potential function: a score you
             assign to a state. Usually it means something like "how promising is this state?" A state closer to the
             goal might have higher potential.
           </p>
           <div class="component-list">
             <div>
+              <strong>s</strong>
+              <span>The current state, before the action.</span>
+            </div>
+            <div>
+              <strong>s'</strong>
+              <span>The next state, after taking action <span class="math-inline">a</span>.</span>
+            </div>
+            <div>
               <strong>r(s,a,s')</strong>
-              <span>The original reward from the real task.</span>
+              <span>The original reward for going from <span class="math-inline">s</span> to <span class="math-inline">s'</span> by taking action <span class="math-inline">a</span>.</span>
             </div>
             <div>
               <strong>r'(s,a,s')</strong>
-              <span>The shaped reward used for learning.</span>
+              <span>The shaped reward for that same transition.</span>
             </div>
             <div>
               <strong>Φ(s)</strong>
