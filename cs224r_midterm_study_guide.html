@@ -1261,8 +1261,56 @@ log π_theta(a_1 | s_1) + log π_theta(a_2 | s_2) + ... + log π_theta(a_T | s_T
           </div>
           <div>
             <strong>Reason 2</strong>
-            <span>The identity <code>∇p = p∇log p</code> lets us use sampled trajectories to estimate the gradient instead of summing over every possible trajectory.</span>
+            <span>The identity <code>∇p = p∇log p</code> lets us estimate the gradient from the rollouts we actually saw instead of summing over every possible rollout.</span>
           </div>
+        </div>
+        <div class="worked">
+          <h4>What "Use Sampled Trajectories" Means</h4>
+          <p>
+            Imagine a robot has thousands of possible futures from the same start state: go left, go right, bump
+            into a wall, reach the goal, wander around, and so on. The true objective averages over all of those
+            possible futures, weighted by how likely the current policy makes them.
+          </p>
+          <p>
+            We usually cannot list every possible future. Instead, we run the policy, say, <code>100</code> times.
+            Those <code>100</code> actual rollouts are sampled trajectories. We compute
+            <code>∇ log π<sub>θ</sub>(a<sub>t</sub>|s<sub>t</sub>)</code> only for the actions that actually happened
+            in those rollouts, multiply by the observed return or advantage, and average the results.
+          </p>
+          <p>
+            This is the same idea as CS109 Monte Carlo estimation: instead of calculating an exact expectation by
+            summing over every outcome, sample outcomes and average them.
+          </p>
+        </div>
+        <div class="worked">
+          <h4>Why The Log Is The Bridge</h4>
+          <p>
+            The gradient of expected return starts like this:
+          </p>
+          <div class="formula">grad J(theta) =
+sum_trajectory grad p_theta(trajectory) * return(trajectory)</div>
+          <p>
+            The problem is the term <code>grad p_theta(trajectory)</code>. A rollout sampled from the policy gives
+            us trajectories with probability <code>p_theta(trajectory)</code>, but the expression above has
+            <code>grad p_theta(trajectory)</code>, not <code>p_theta(trajectory)</code>.
+          </p>
+          <p>
+            The log trick rewrites it into something with <code>p_theta(trajectory)</code> in front:
+          </p>
+          <div class="formula">grad p_theta(trajectory) =
+p_theta(trajectory) * grad log p_theta(trajectory)</div>
+          <p>
+            Now the full sum becomes:
+          </p>
+          <div class="formula">grad J(theta) =
+sum_trajectory p_theta(trajectory) * grad log p_theta(trajectory) * return(trajectory)
+
+= E_{trajectory ~ p_theta}[grad log p_theta(trajectory) * return(trajectory)]</div>
+          <p>
+            That last line is sampleable because it is an expectation over trajectories drawn from the current
+            policy. So it is not that logs are magic; it is that <code>grad log p = grad p / p</code>, which lets
+            us rewrite the gradient as an average over samples from <code>p</code>.
+          </p>
         </div>
         <p>
           So the practical meaning is: after a rollout, we only need the log probabilities of the actions we
@@ -1276,7 +1324,8 @@ log π_theta(a_1 | s_1) + log π_theta(a_2 | s_2) + ... + log π_theta(a_T | s_T
             Yes: log probabilities make the gradient easier to compute and estimate. Products of probabilities
             appear in trajectory distributions. Logs turn products into sums, so <code>log p_theta(tau)</code>
             becomes a sum of <code>log pi_theta(a_t | s_t)</code>. Also, <code>grad p = p grad log p</code> is
-            what makes the policy-gradient estimator sampleable from rollouts.
+            what changes a sum involving <code>grad p</code> into an expectation involving <code>p</code>, which
+            lets us estimate the gradient from sampled rollouts.
           </div>
         </details>
       </section>
