@@ -1402,6 +1402,82 @@ p_theta(tau) = p(s_1) prod_t pi_theta(a_t | s_t) p(s_{t+1} | s_t, a_t)
 RL objective:
 J(theta) = E_{tau ~ p_theta(tau)}[sum_t r(s_t, a_t)]</div>
 
+        <div class="worked">
+          <h4>Breakdown: Trajectory Distribution</h4>
+          <p>
+            A trajectory <span class="math-inline">τ</span> is one full rollout: the states the agent visited and
+            the actions it took. For example:
+          </p>
+          <div class="plain-equation">
+            <span class="eq-main">τ = (s<sub>1</sub>, a<sub>1</sub>, s<sub>2</sub>, a<sub>2</sub>, s<sub>3</sub>)</span>
+            <span class="eq-caption">Start in state <span class="math-inline">s<sub>1</sub></span>, take action <span class="math-inline">a<sub>1</sub></span>, land in <span class="math-inline">s<sub>2</sub></span>, take <span class="math-inline">a<sub>2</sub></span>, land in <span class="math-inline">s<sub>3</sub></span>.</span>
+          </div>
+          <p>
+            The trajectory distribution asks: under policy <span class="math-inline">π<sub>θ</sub></span>, how
+            likely is this exact rollout?
+          </p>
+          <div class="component-list">
+            <div>
+              <strong>p<sub>θ</sub>(τ)</strong>
+              <span>The probability of the whole trajectory happening.</span>
+            </div>
+            <div>
+              <strong>p(s<sub>1</sub>)</strong>
+              <span>The probability that the environment starts in state <span class="math-inline">s<sub>1</sub></span>.</span>
+            </div>
+            <div>
+              <strong>π<sub>θ</sub>(a<sub>t</sub> | s<sub>t</sub>)</strong>
+              <span>The probability that the policy chooses action <span class="math-inline">a<sub>t</sub></span> in state <span class="math-inline">s<sub>t</sub></span>.</span>
+            </div>
+            <div>
+              <strong>p(s<sub>t+1</sub> | s<sub>t</sub>, a<sub>t</sub>)</strong>
+              <span>The probability that the environment moves to <span class="math-inline">s<sub>t+1</sub></span> after action <span class="math-inline">a<sub>t</sub></span>.</span>
+            </div>
+            <div>
+              <strong>Π<sub>t</sub></strong>
+              <span>Multiply this factor over every time step in the rollout.</span>
+            </div>
+            <div>
+              <strong>θ</strong>
+              <span>The policy parameters. They affect the action probabilities, not the environment dynamics.</span>
+            </div>
+          </div>
+          <p>
+            Read the formula as: probability of starting there, times probability the policy chose each action,
+            times probability the environment produced each next state.
+          </p>
+        </div>
+
+        <div class="worked">
+          <h4>Breakdown: RL Objective</h4>
+          <p>
+            The objective <span class="math-inline">J(θ)</span> is the thing training tries to maximize: expected
+            total reward when the current policy is used.
+          </p>
+          <div class="component-list">
+            <div>
+              <strong>J(θ)</strong>
+              <span>The score of policy parameters <span class="math-inline">θ</span>. Higher is better.</span>
+            </div>
+            <div>
+              <strong>τ ~ p<sub>θ</sub>(τ)</strong>
+              <span>Sample a trajectory by running the current policy in the environment.</span>
+            </div>
+            <div>
+              <strong>E[ ... ]</strong>
+              <span>Average over many possible rollouts, including policy randomness and environment randomness.</span>
+            </div>
+            <div>
+              <strong>Σ<sub>t</sub> r(s<sub>t</sub>, a<sub>t</sub>)</strong>
+              <span>Add up the rewards along one rollout. This is the rollout's return.</span>
+            </div>
+          </div>
+          <p>
+            Plain English: run the policy many times, add up the rewards in each rollout, average those totals,
+            and adjust <span class="math-inline">θ</span> to make that average larger.
+          </p>
+        </div>
+
         <h3>Discounting</h3>
         <p>
           A discounted return is
