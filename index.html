@@ -326,6 +326,22 @@
       font-size: 0.93em;
     }
 
+    .math-inline {
+      display: inline-block;
+      padding: 0.08rem 0.22rem;
+      border-radius: 4px;
+      background: var(--code);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 1.02em;
+      white-space: nowrap;
+    }
+
+    .math-inline sub,
+    .math-inline sup {
+      line-height: 0;
+      font-size: 0.72em;
+    }
+
     details.question {
       margin: 12px 0;
       padding: 0;
@@ -619,8 +635,8 @@ G_t = r_t + gamma r_{t+1} + gamma^2 r_{t+2} + ...</div>
           <div class="card">
             <h4>Discounted Example</h4>
             <p>
-              If <code>gamma = 0.5</code>, the same future has return
-              <code>0 + 0.5 * 0 + 0.5^2 * 1 = 0.25</code>. The reward still happens, but delayed reward counts less.
+              If <span class="math-inline">γ = 0.5</span>, the same future has return
+              <span class="math-inline">0 + 0.5 · 0 + 0.5<sup>2</sup> · 1 = 0.25</span>. The reward still happens, but delayed reward counts less.
             </p>
           </div>
         </div>
@@ -1345,32 +1361,32 @@ sum_trajectory p_theta(trajectory) * grad log p_theta(trajectory) * return(traje
           </thead>
           <tbody>
             <tr>
-              <td><code>s_t</code></td>
+              <td><span class="math-inline">s<sub>t</sub></span></td>
               <td>state</td>
               <td>the information that fully describes the world for predicting the future</td>
             </tr>
             <tr>
-              <td><code>o_t</code></td>
+              <td><span class="math-inline">o<sub>t</sub></span></td>
               <td>observation</td>
               <td>what the agent actually sees; may be partial</td>
             </tr>
             <tr>
-              <td><code>a_t</code></td>
+              <td><span class="math-inline">a<sub>t</sub></span></td>
               <td>action</td>
               <td>the decision made by the agent</td>
             </tr>
             <tr>
-              <td><code>p(s_{t+1} | s_t, a_t)</code></td>
+              <td><span class="math-inline">p(s<sub>t+1</sub> | s<sub>t</sub>, a<sub>t</sub>)</span></td>
               <td>dynamics</td>
               <td>how the world changes after an action</td>
             </tr>
             <tr>
-              <td><code>r(s_t, a_t)</code></td>
+              <td><span class="math-inline">r(s<sub>t</sub>, a<sub>t</sub>)</span></td>
               <td>reward</td>
               <td>the scalar score for what just happened</td>
             </tr>
             <tr>
-              <td><code>pi(a | s)</code></td>
+              <td><span class="math-inline">π(a | s)</span></td>
               <td>policy</td>
               <td>the agent's behavior rule</td>
             </tr>
@@ -1388,15 +1404,16 @@ J(theta) = E_{tau ~ p_theta(tau)}[sum_t r(s_t, a_t)]</div>
 
         <h3>Discounting</h3>
         <p>
-          A discounted return is <code>G_t = r_t + gamma r_{t+1} + gamma^2 r_{t+2} + ...</code>.
-          Smaller <code>gamma</code> values make delayed rewards matter less. Larger values make the agent
+          A discounted return is
+          <span class="math-inline">G<sub>t</sub> = r<sub>t</sub> + γr<sub>t+1</sub> + γ<sup>2</sup>r<sub>t+2</sub> + ...</span>.
+          Smaller <span class="math-inline">γ</span> values make delayed rewards matter less. Larger values make the agent
           care more about long-term outcomes.
         </p>
 
         <div class="trap">
           <strong>Practice trap.</strong> With a sparse terminal reward of +1 for success, increasing
-          <code>gamma</code> does not favor speed. It makes slow success less punished. To favor quick success,
-          decrease <code>gamma</code> or add an explicit time penalty.
+          <span class="math-inline">γ</span> does not favor speed. It makes slow success less punished. To favor quick success,
+          decrease <span class="math-inline">γ</span> or add an explicit time penalty.
         </div>
 
         <h3>Dense Rewards And Shaping</h3>
@@ -1431,7 +1448,7 @@ the shaping terms telescope over time, so they guide learning without changing w
             <tr>
               <td>Add constant forever in infinite-horizon discounted continuing task</td>
               <td>Yes</td>
-              <td>Every policy receives the same extra <code>c / (1 - gamma)</code>.</td>
+              <td>Every policy receives the same extra <span class="math-inline">c / (1 - γ)</span>.</td>
             </tr>
             <tr>
               <td>Add constant per step in episodic task with variable length</td>
@@ -1439,7 +1456,7 @@ the shaping terms telescope over time, so they guide learning without changing w
               <td>Positive constant becomes a survival bonus; negative constant becomes a time penalty.</td>
             </tr>
             <tr>
-              <td>Change <code>gamma</code></td>
+              <td>Change <span class="math-inline">γ</span></td>
               <td>No</td>
               <td>It changes the tradeoff between sooner and later rewards.</td>
             </tr>
