@@ -229,6 +229,95 @@
 
     .formula .indent { padding-left: 1.35rem; }
 
+    .plain-equation {
+      margin: 14px 0;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfaf5;
+      overflow-x: auto;
+    }
+
+    .plain-equation .eq-main {
+      display: block;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 1.22rem;
+      line-height: 1.45;
+      white-space: nowrap;
+    }
+
+    .plain-equation .eq-caption {
+      display: block;
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .component-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin: 14px 0 18px;
+    }
+
+    .component-list div,
+    .case-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fffefa;
+    }
+
+    .component-list div {
+      padding: 10px 12px;
+    }
+
+    .component-list strong {
+      display: block;
+      margin-bottom: 2px;
+      color: var(--accent-2);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.9rem;
+    }
+
+    .component-list span {
+      color: var(--muted);
+      font-size: 0.94rem;
+    }
+
+    .case-stack {
+      display: grid;
+      gap: 14px;
+      margin: 16px 0;
+    }
+
+    .case-card {
+      padding: 14px 16px;
+    }
+
+    .case-card h5 {
+      margin: 0 0 8px;
+      font-size: 0.98rem;
+      line-height: 1.25;
+    }
+
+    .case-card ol {
+      margin: 8px 0 0;
+      padding-left: 22px;
+    }
+
+    .case-card li {
+      margin: 6px 0;
+    }
+
+    .case-card .result {
+      margin-top: 10px;
+      padding: 9px 10px;
+      border-left: 4px solid var(--accent);
+      border-radius: 6px;
+      background: #f4faf8;
+      font-weight: 700;
+    }
+
     code {
       padding: 0.12rem 0.28rem;
       border-radius: 4px;
@@ -388,6 +477,7 @@
       header.hero { padding: 24px; }
       header h1 { font-size: 2rem; }
       .grid, .tri-grid { grid-template-columns: 1fr; }
+      .component-list { grid-template-columns: 1fr; }
       .concept-map { grid-template-columns: 1fr; }
       .arrow { min-height: 20px; }
       .two-col { columns: 1; }
@@ -1068,57 +1158,74 @@ update θ in that direction</div>
             For teaching only, pretend we update <code>p = p(right)</code> directly. Real policies usually update
             <code>θ</code>, the neural-net weights, and then <code>p(right)</code> changes because the weights changed.
           </p>
-          <div class="formula">p ← p + η · G · derivative_of_log_probability_of_sampled_action</div>
+          <div class="plain-equation">
+            <span class="eq-main">p<sub>new</sub> = p<sub>old</sub> + η × G × g</span>
+            <span class="eq-caption">Here <code>g</code> means: derivative of the log probability of the sampled action.</span>
+          </div>
+          <div class="component-list">
+            <div>
+              <strong>p<sub>old</sub></strong>
+              <span>The current probability of choosing <code>right</code>. In this example, <code>p<sub>old</sub> = 0.30</code>.</span>
+            </div>
+            <div>
+              <strong>p<sub>new</sub></strong>
+              <span>The new probability of choosing <code>right</code> after one update.</span>
+            </div>
+            <div>
+              <strong>η</strong>
+              <span>The learning rate, or step size. Here <code>η = 0.005</code>.</span>
+            </div>
+            <div>
+              <strong>G</strong>
+              <span>The return from the sampled rollout. Good rollout: <code>G = +10</code>. Bad rollout: <code>G = -10</code>.</span>
+            </div>
+            <div>
+              <strong>g</strong>
+              <span>The direction that makes the sampled action more likely. It depends on whether the sampled action was <code>right</code> or <code>left</code>.</span>
+            </div>
+            <div>
+              <strong>η × G × g</strong>
+              <span>The actual amount added to <code>p(right)</code>.</span>
+            </div>
+          </div>
           <p>
-            Start with <code>p = p(right) = 0.30</code>, so <code>p(left) = 0.70</code>. Use learning rate
-            <code>η = 0.005</code>. Here <code>G</code> is the return from the sampled rollout.
+            Start with <code>p(right) = 0.30</code>, so <code>p(left) = 0.70</code>. The important detail is that
+            <code>p</code> means <code>p(right)</code>, so making <code>left</code> more likely means decreasing
+            <code>p</code>.
           </p>
-          <table>
-            <thead>
-              <tr>
-                <th>Sampled action</th>
-                <th>Return</th>
-                <th>Derivative</th>
-                <th>Update to <code>p(right)</code></th>
-                <th>New <code>p(right)</code></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><code>right</code></td>
-                <td><code>G = +10</code></td>
-                <td><code>1 / p = 1 / 0.30 = 3.33</code></td>
-                <td><code>0.005 · 10 · 3.33 = +0.167</code></td>
-                <td><code>0.30 + 0.167 = 0.467</code></td>
-              </tr>
-              <tr>
-                <td><code>left</code></td>
-                <td><code>G = +10</code></td>
-                <td><code>-1 / (1 - p) = -1 / 0.70 = -1.43</code></td>
-                <td><code>0.005 · 10 · -1.43 = -0.071</code></td>
-                <td><code>0.30 - 0.071 = 0.229</code></td>
-              </tr>
-              <tr>
-                <td><code>right</code></td>
-                <td><code>G = -10</code></td>
-                <td><code>1 / p = 3.33</code></td>
-                <td><code>0.005 · -10 · 3.33 = -0.167</code></td>
-                <td><code>0.30 - 0.167 = 0.133</code></td>
-              </tr>
-              <tr>
-                <td><code>left</code></td>
-                <td><code>G = -10</code></td>
-                <td><code>-1 / (1 - p) = -1.43</code></td>
-                <td><code>0.005 · -10 · -1.43 = +0.071</code></td>
-                <td><code>0.30 + 0.071 = 0.371</code></td>
-              </tr>
-            </tbody>
-          </table>
+
+          <div class="case-stack">
+            <div class="case-card">
+              <h5>Case 1: The policy sampled <code>right</code> and got good return</h5>
+              <p>The sampled action worked, so the update should make <code>right</code> more likely.</p>
+              <ol>
+                <li>Sampled-action probability: <code>P(right) = p = 0.30</code>.</li>
+                <li>Log-probability derivative: <code>g = d/dp log(p) = 1 / p = 1 / 0.30 = 3.33</code>.</li>
+                <li>Update amount: <code>η × G × g = 0.005 × 10 × 3.33 = +0.167</code>.</li>
+                <li>New probability: <code>p<sub>new</sub> = 0.30 + 0.167 = 0.467</code>.</li>
+              </ol>
+              <div class="result">Good <code>right</code> rollout: <code>p(right)</code> goes up from <code>0.30</code> to <code>0.467</code>.</div>
+            </div>
+
+            <div class="case-card">
+              <h5>Case 2: The policy sampled <code>left</code> and got good return</h5>
+              <p>The sampled action worked, so the update should make <code>left</code> more likely.</p>
+              <ol>
+                <li>Sampled-action probability: <code>P(left) = 1 - p = 0.70</code>.</li>
+                <li>Log-probability derivative: <code>g = d/dp log(1 - p) = -1 / (1 - p) = -1 / 0.70 = -1.43</code>.</li>
+                <li>Update amount: <code>η × G × g = 0.005 × 10 × -1.43 = -0.071</code>.</li>
+                <li>New probability: <code>p<sub>new</sub> = 0.30 - 0.071 = 0.229</code>.</li>
+              </ol>
+              <div class="result">Good <code>left</code> rollout: <code>p(right)</code> goes down from <code>0.30</code> to <code>0.229</code>, which makes <code>left</code> more likely.</div>
+            </div>
+          </div>
+
           <p>
-            Read the table by sign. Positive return reinforces the sampled action. Negative return punishes the
-            sampled action. If the sampled action was <code>left</code>, reinforcing <code>left</code> means
-            lowering <code>p(right)</code>, because this toy policy only has two actions. In actor-critic methods,
-            replace <code>G</code> with advantage <code>A = G - baseline</code>, but the logic is the same.
+            If the return is bad, <code>G</code> is negative, so the update punishes the sampled action instead.
+            Sampled <code>right</code> with <code>G = -10</code> gives <code>p<sub>new</sub> = 0.133</code>.
+            Sampled <code>left</code> with <code>G = -10</code> gives <code>p<sub>new</sub> = 0.371</code>.
+            In actor-critic methods, replace <code>G</code> with advantage <code>A = G - baseline</code>, but the
+            sign logic is the same.
           </p>
         </div>
 
