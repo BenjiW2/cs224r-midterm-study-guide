@@ -1,0 +1,2232 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CS224R Midterm Study Guide</title>
+  <style>
+    :root {
+      --bg: #f7f6f1;
+      --paper: #fffdf7;
+      --ink: #24211d;
+      --muted: #625d55;
+      --line: #ded8ca;
+      --soft: #eee8da;
+      --accent: #0f6b63;
+      --accent-2: #9b4c1f;
+      --accent-3: #4b5f9e;
+      --ok: #1f7a46;
+      --warn: #a05a00;
+      --bad: #9a2f2f;
+      --code: #f0efe9;
+      --shadow: 0 10px 28px rgba(36, 33, 29, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(90deg, rgba(15, 107, 99, 0.08), transparent 32rem),
+        var(--bg);
+      font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    a { color: var(--accent); }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 300px minmax(0, 1fr);
+      min-height: 100vh;
+    }
+
+    aside {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: auto;
+      padding: 24px 18px;
+      border-right: 1px solid var(--line);
+      background: rgba(255, 253, 247, 0.88);
+      backdrop-filter: blur(8px);
+    }
+
+    aside h1 {
+      margin: 0 0 6px;
+      font-size: 1.1rem;
+      line-height: 1.2;
+    }
+
+    aside p {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    nav a {
+      display: block;
+      padding: 6px 8px;
+      border-radius: 6px;
+      color: var(--ink);
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+
+    nav a:hover { background: var(--soft); color: var(--accent); }
+
+    main {
+      max-width: 1100px;
+      padding: 48px 42px 96px;
+    }
+
+    header.hero {
+      padding: 42px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: var(--accent);
+      font-weight: 700;
+      letter-spacing: 0;
+      text-transform: uppercase;
+      font-size: 0.78rem;
+    }
+
+    h1, h2, h3, h4 {
+      line-height: 1.15;
+      letter-spacing: 0;
+    }
+
+    header h1 {
+      margin: 0;
+      max-width: 820px;
+      font-size: 2.75rem;
+    }
+
+    header .subtitle {
+      max-width: 820px;
+      color: var(--muted);
+      font-size: 1.12rem;
+    }
+
+    section {
+      margin-top: 48px;
+      padding-top: 10px;
+    }
+
+    h2 {
+      margin: 0 0 16px;
+      font-size: 2rem;
+    }
+
+    h3 {
+      margin: 28px 0 10px;
+      font-size: 1.28rem;
+    }
+
+    h4 {
+      margin: 20px 0 8px;
+      font-size: 1rem;
+    }
+
+    p { margin: 0 0 14px; }
+
+    ul, ol { padding-left: 24px; }
+
+    li { margin: 5px 0; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin: 16px 0;
+    }
+
+    .tri-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin: 16px 0;
+    }
+
+    .card, .note, .formula, .question, .trap, .worked, .map {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+    }
+
+    .card, .note, .formula, .trap, .worked, .map {
+      padding: 16px;
+    }
+
+    .note { border-left: 4px solid var(--accent); }
+    .trap { border-left: 4px solid var(--bad); }
+    .worked { border-left: 4px solid var(--accent-3); }
+
+    .tag {
+      display: inline-block;
+      margin: 0 6px 6px 0;
+      padding: 3px 7px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      background: #fbfaf5;
+      font-size: 0.78rem;
+    }
+
+    .formula {
+      margin: 14px 0;
+      background: #fbfaf5;
+      overflow-x: auto;
+      white-space: pre-wrap;
+    }
+
+    .formula.rendered-formula {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 1.02rem;
+      line-height: 1.7;
+    }
+
+    .formula .math-line {
+      display: block;
+      min-height: 1.4em;
+      white-space: nowrap;
+    }
+
+    .formula .formula-label {
+      display: block;
+      margin: 0.3rem 0 0.12rem;
+      color: var(--accent-2);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 0.86rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .formula .op {
+      font-style: normal;
+      font-weight: 700;
+    }
+
+    .formula sub,
+    .formula sup {
+      line-height: 0;
+      font-size: 0.74em;
+    }
+
+    .formula .text-note {
+      color: var(--muted);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 0.92rem;
+    }
+
+    .formula .indent { padding-left: 1.35rem; }
+
+    code {
+      padding: 0.12rem 0.28rem;
+      border-radius: 4px;
+      background: var(--code);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.93em;
+    }
+
+    details.question {
+      margin: 12px 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    details.question summary {
+      cursor: pointer;
+      padding: 13px 15px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    details.question .answer {
+      padding: 0 15px 15px;
+      border-top: 1px solid var(--line);
+      background: #fffefa;
+    }
+
+    .answer-label {
+      display: inline-block;
+      margin-top: 10px;
+      color: var(--ok);
+      font-weight: 700;
+    }
+
+    .concept-map {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      align-items: stretch;
+      margin: 18px 0;
+    }
+
+    .node {
+      min-height: 74px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fffefa;
+      font-weight: 700;
+    }
+
+    .node small {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-2);
+      font-weight: 800;
+    }
+
+    table {
+      width: 100%;
+      margin: 16px 0;
+      border-collapse: collapse;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+    }
+
+    th, td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+      text-align: left;
+    }
+
+    th {
+      background: var(--soft);
+      font-size: 0.88rem;
+    }
+
+    tr:last-child td { border-bottom: 0; }
+
+    .two-col {
+      columns: 2;
+      column-gap: 30px;
+    }
+
+    .pill-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 14px 0;
+    }
+
+    .pill-list span {
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: var(--soft);
+      font-size: 0.9rem;
+    }
+
+    .checklist label {
+      display: block;
+      margin: 8px 0;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fffefa;
+    }
+
+    .mini {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .kbd {
+      display: inline-block;
+      padding: 1px 6px;
+      border: 1px solid #c6c0b4;
+      border-bottom-width: 2px;
+      border-radius: 4px;
+      background: #fbfaf6;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.82rem;
+    }
+
+    .flash {
+      border-left: 4px solid var(--warn);
+    }
+
+    .source {
+      color: var(--muted);
+      font-size: 0.86rem;
+    }
+
+    @media (max-width: 940px) {
+      .layout { display: block; }
+      aside {
+        position: static;
+        height: auto;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+      main { padding: 28px 18px 72px; }
+      header.hero { padding: 24px; }
+      header h1 { font-size: 2rem; }
+      .grid, .tri-grid { grid-template-columns: 1fr; }
+      .concept-map { grid-template-columns: 1fr; }
+      .arrow { min-height: 20px; }
+      .two-col { columns: 1; }
+    }
+
+    @media print {
+      body { background: white; }
+      .layout { display: block; }
+      aside { display: none; }
+      main { max-width: none; padding: 0; }
+      header.hero, .card, .note, .formula, .question, .trap, .worked, .map {
+        box-shadow: none;
+        break-inside: avoid;
+      }
+      details.question[open] .answer { display: block; }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside>
+      <h1>CS224R Midterm Guide</h1>
+      <p>From CS109 and Math 51 to the practice problems and reference sheet.</p>
+      <nav>
+        <a href="#start-here">Start Here</a>
+        <a href="#how">How To Use This</a>
+        <a href="#map">Course Map</a>
+        <a href="#math">Math And ML Crash</a>
+        <a href="#mdp">MDPs And Rewards</a>
+        <a href="#imitation">Imitation Learning</a>
+        <a href="#pg">Policy Gradients</a>
+        <a href="#actor-critic">Actor-Critic And PPO</a>
+        <a href="#qlearning">Q-Learning And DQN</a>
+        <a href="#offline">Offline RL</a>
+        <a href="#reward">Reward Learning And RLHF</a>
+        <a href="#reasoning">RL For LLM Reasoning</a>
+        <a href="#mbrl">Model-Based RL</a>
+        <a href="#multitask">Multi-Task And Goals</a>
+        <a href="#reference">Reference Sheet Decoded</a>
+        <a href="#practice">Practice Problem Patterns</a>
+        <a href="#final-drill">Final Drill</a>
+      </nav>
+    </aside>
+
+    <main>
+      <header class="hero" id="top">
+        <p class="eyebrow">CS224R Midterm, Spring 2025-2026</p>
+        <h1>Deep Reinforcement Learning From Scratch</h1>
+        <p class="subtitle">
+          This guide is built from the lecture PDFs, the released practice questions, the practice solutions,
+          and the exam reference sheet. It assumes CS109 probability and Math 51 linear algebra/calculus,
+          but no prior ML or RL fluency.
+        </p>
+        <div class="pill-list">
+          <span>MDPs</span>
+          <span>Behavior cloning</span>
+          <span>Policy gradients</span>
+          <span>Actor-critic</span>
+          <span>PPO</span>
+          <span>DQN</span>
+          <span>Offline RL</span>
+          <span>RLHF</span>
+          <span>Model-based RL</span>
+        </div>
+      </header>
+
+      <section id="start-here">
+        <h2>Start Here</h2>
+        <div class="note">
+          <strong>The entire course is about one problem:</strong> an agent repeatedly sees a situation,
+          picks an action, gets feedback, and tries to pick better actions next time. Most formulas are just
+          different ways to answer "which action was better than expected?"
+        </div>
+
+        <h3>A Tiny Example</h3>
+        <p>
+          Imagine a robot in a hallway. Each second it can move left, move right, or stop. It gets +1 if it
+          reaches the snack table and 0 otherwise.
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>RL word</th>
+              <th>Hallway meaning</th>
+              <th>What to picture</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>State <code>s</code></td>
+              <td>Where the robot is, maybe plus battery and obstacles</td>
+              <td>The input</td>
+            </tr>
+            <tr>
+              <td>Action <code>a</code></td>
+              <td>Move left, move right, or stop</td>
+              <td>The output</td>
+            </tr>
+            <tr>
+              <td>Policy <code>π(a|s)</code></td>
+              <td>Probabilities for actions in a state</td>
+              <td>The model you train</td>
+            </tr>
+            <tr>
+              <td>Reward <code>r</code></td>
+              <td>+1 at the snack table, 0 otherwise</td>
+              <td>The feedback</td>
+            </tr>
+            <tr>
+              <td>Return</td>
+              <td>Total future reward</td>
+              <td>The score for a rollout</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>Return: The Score Of A Whole Future</h3>
+        <p>
+          A reward is one piece of feedback at one time step. A return is the total reward you get from now
+          into the future. In RL, the agent does not just ask "was this action good right now?" It asks
+          "if I take this action, how good is the future I end up with?"
+        </p>
+        <div class="formula">One-step reward:
+r_t = feedback at time t
+
+Return from time t:
+G_t = r_t + r_{t+1} + r_{t+2} + ...
+
+Discounted return:
+G_t = r_t + gamma r_{t+1} + gamma^2 r_{t+2} + ...</div>
+        <div class="grid">
+          <div class="card">
+            <h4>Undiscounted Example</h4>
+            <p>
+              The hallway robot gets rewards <code>0, 0, 1</code> because it reaches the snack table on the third
+              step. The return at the beginning is <code>0 + 0 + 1 = 1</code>.
+            </p>
+          </div>
+          <div class="card">
+            <h4>Discounted Example</h4>
+            <p>
+              If <code>gamma = 0.5</code>, the same future has return
+              <code>0 + 0.5 * 0 + 0.5^2 * 1 = 0.25</code>. The reward still happens, but delayed reward counts less.
+            </p>
+          </div>
+        </div>
+        <div class="note">
+          <strong>Why this matters:</strong> when policy gradient says "increase probability of actions in
+          high-return trajectories," it means actions are credited according to the future total reward after
+          them, not just the immediate reward at that same time step.
+        </div>
+
+        <h3>Three Questions Every Algorithm Asks</h3>
+        <div class="tri-grid">
+          <div class="card">
+            <h4>1. What data do I have?</h4>
+            <p>Expert examples, fresh rollouts, a replay buffer, an offline dataset, human preferences, or a learned model.</p>
+          </div>
+          <div class="card">
+            <h4>2. How do I score an action?</h4>
+            <p>Use raw return, a value function <code>V</code>, an action-value function <code>Q</code>, an advantage <code>A</code>, or a reward model.</p>
+          </div>
+          <div class="card">
+            <h4>3. How do I improve?</h4>
+            <p>Copy good actions, increase their probability, choose the largest Q-value, or plan through a model.</p>
+          </div>
+        </div>
+
+        <h3>How To Read The Symbols</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Symbol pattern</th>
+              <th>Read it as</th>
+              <th>Example</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>π<sub>θ</sub>(a|s)</code></td>
+              <td>Policy with parameters theta: probability of action a in state s</td>
+              <td>"What would my neural net do here?"</td>
+            </tr>
+            <tr>
+              <td><code>V<sup>π</sup>(s)</code></td>
+              <td>Value of state s if we follow policy π</td>
+              <td>"How good is it to be here?"</td>
+            </tr>
+            <tr>
+              <td><code>Q<sup>π</sup>(s,a)</code></td>
+              <td>Value of taking action a in state s, then following π</td>
+              <td>"How good is this action here?"</td>
+            </tr>
+            <tr>
+              <td><code>A<sup>π</sup>(s,a)</code></td>
+              <td>Advantage: Q minus V</td>
+              <td>"Was this action better than the usual action here?"</td>
+            </tr>
+            <tr>
+              <td><code>𝔼[ ... ]</code></td>
+              <td>Average over randomness</td>
+              <td>"Average over many rollouts"</td>
+            </tr>
+            <tr>
+              <td><code>∇θ</code></td>
+              <td>Gradient with respect to theta</td>
+              <td>"Which way should I move the neural net weights?"</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="note">
+          <strong>What is θ?</strong> Theta is not a new RL object. It just means "the parameters we are
+          learning." If the policy is a neural network, θ is the giant vector containing every weight and bias
+          in that network. So <code>π<sub>θ</sub>(a|s)</code> means: feed state <code>s</code> into the neural net
+          with weights <code>θ</code>, and read off the probability it assigns to action <code>a</code>.
+        </div>
+
+        <h3>The One Mental Model To Keep</h3>
+        <div class="formula">If action was better than expected:
+increase log πθ(a|s)
+
+If action was worse than expected:
+decrease log πθ(a|s)
+
+Advantage Aπ(s,a) = Qπ(s,a) - Vπ(s) is the "better than expected" number.</div>
+
+        <details class="question">
+          <summary>Sanity check: if <code>A(s,a) &gt; 0</code>, should the policy make <code>a</code> more or less likely in <code>s</code>?</summary>
+          <div class="answer">
+            <span class="answer-label">Answer.</span>
+            More likely. Positive advantage means the action was better than the policy's normal expected
+            behavior in that state.
+          </div>
+        </details>
+      </section>
+
+      <section id="how">
+        <h2>How To Use This</h2>
+        <div class="grid">
+          <div class="card">
+            <h3>Read In This Order</h3>
+            <ol>
+              <li>Read the crash section and MDP section until the notation stops feeling foreign.</li>
+              <li>Read each algorithm family once for intuition.</li>
+              <li>Return to the formulas in the reference-sheet section and explain every symbol aloud.</li>
+              <li>Do the collapsible questions. Open the answer only after committing to one.</li>
+            </ol>
+          </div>
+          <div class="card">
+            <h3>What The Practice Set Signals</h3>
+            <p>The released problems emphasize conceptual precision more than long derivations:</p>
+            <ul>
+              <li>which reward transformations preserve the optimal policy,</li>
+              <li>when baselines are unbiased in policy gradients,</li>
+              <li>why replay buffers and target networks stabilize DQN,</li>
+              <li>why n-step returns can become biased off-policy,</li>
+              <li>how AWR, IQL, RLHF preferences, and model-based planning work.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="note">
+          <strong>Exam mindset.</strong> Most mistakes in this material come from mixing up similar words:
+          value vs Q-value, on-policy vs off-policy, sampled action vs averaged-over-action, model-free vs
+          model-based, reward scaling vs reward shaping, and learning a reward vs optimizing a reward.
+        </div>
+      </section>
+
+      <section id="map">
+        <h2>Course Map</h2>
+        <p>Everything in the first twelve lectures fits into one story: how to choose actions that lead to high future reward.</p>
+        <div class="concept-map map">
+          <div class="node">Data<br><small>rollouts, demonstrations, preferences</small></div>
+          <div class="arrow">-&gt;</div>
+          <div class="node">Estimator<br><small>return, V, Q, advantage, reward model, dynamics model</small></div>
+          <div class="arrow">-&gt;</div>
+          <div class="node">Policy Update<br><small>imitate, policy gradient, greedy Q, planning</small></div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Family</th>
+              <th>Core question</th>
+              <th>Data used</th>
+              <th>Main failure mode</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Imitation learning</td>
+              <td>Can I mimic good behavior?</td>
+              <td>Expert demonstrations</td>
+              <td>Cannot exceed data, distribution shift from compounding errors</td>
+            </tr>
+            <tr>
+              <td>Policy gradients</td>
+              <td>Can I directly increase probability of high-return actions?</td>
+              <td>Usually current policy rollouts</td>
+              <td>High-variance estimates, poor data efficiency</td>
+            </tr>
+            <tr>
+              <td>Actor-critic / PPO</td>
+              <td>Can a value estimate tell the policy what was better than expected?</td>
+              <td>Fresh rollouts, sometimes reused briefly</td>
+              <td>Biased or unstable value estimates, too-large policy updates</td>
+            </tr>
+            <tr>
+              <td>Q-learning / DQN</td>
+              <td>Can I learn the value of each action and choose the best one?</td>
+              <td>Replay buffer, off-policy</td>
+              <td>Moving targets, overestimation, divergence with function approximation</td>
+            </tr>
+            <tr>
+              <td>Offline RL</td>
+              <td>Can I improve using only a fixed dataset?</td>
+              <td>Static dataset from behavior policy</td>
+              <td>Overestimating unseen actions and leaving data support</td>
+            </tr>
+            <tr>
+              <td>Reward learning / RLHF</td>
+              <td>Can humans or examples define the reward?</td>
+              <td>Goal labels, demonstrations, preferences</td>
+              <td>Reward hacking, noisy preferences, imperfect learned rewards</td>
+            </tr>
+            <tr>
+              <td>Model-based RL</td>
+              <td>Can I learn or use a simulator to plan?</td>
+              <td>Transitions, sometimes reward labels</td>
+              <td>Model error compounds under long rollouts</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="math">
+        <h2>Math And ML Crash</h2>
+
+        <h3>Random Variables And Expectations</h3>
+        <p>
+          CS109 already gives you the main tool: an expectation is an average under a distribution.
+          In RL, the random variable is often an entire trajectory, not a single label.
+        </p>
+        <div class="formula">Discrete expectation: E[f(X)] = sum_x p(x) f(x)
+
+Trajectory expectation: E_{tau ~ p_theta(tau)}[R(tau)]
+means: average total reward over rollouts generated by policy pi_theta.</div>
+
+        <h3>Gradients</h3>
+        <p>
+          A gradient is the answer to: "if I change the parameters a tiny bit, which direction makes the
+          objective go up fastest?" If you have seen derivatives in Math 51, a gradient is just the multi-variable
+          version of a derivative.
+        </p>
+        <div class="grid">
+          <div class="card">
+            <h4>One Number Case</h4>
+            <p>
+              Suppose a policy has one parameter <code>θ</code>. If increasing <code>θ</code> makes reward go up,
+              the derivative is positive, so gradient ascent increases <code>θ</code>. If increasing <code>θ</code>
+              makes reward go down, the derivative is negative, so gradient ascent decreases <code>θ</code>.
+            </p>
+          </div>
+          <div class="card">
+            <h4>Neural Net Case</h4>
+            <p>
+              A neural net has thousands or millions of parameters. The gradient has one entry per parameter.
+              Each entry says whether that weight should move up or down, and by roughly how much.
+            </p>
+          </div>
+        </div>
+        <div class="formula">Gradient ascent: used when maximizing reward
+θ ← θ + η ∇θ J(θ)
+
+Gradient descent: used when minimizing a loss
+θ ← θ - η ∇θ L(θ)</div>
+        <p>
+          Here <code>η</code> is the learning rate: the step size. <code>J(θ)</code> usually means an objective we
+          want to maximize, like expected return. <code>L(θ)</code> usually means a loss we want to minimize,
+          like prediction error.
+        </p>
+        <div class="worked">
+          <h4>Worked Example: One Parameter</h4>
+          <p>
+            Suppose the policy has one parameter <code>θ</code>. Start at <code>θ = 2</code>. Use learning rate
+            <code>η = 0.1</code>.
+          </p>
+          <div class="grid">
+            <div class="card">
+              <h4>Gradient Ascent</h4>
+              <p>We want to maximize reward:</p>
+              <div class="formula">J(θ) = 4θ - θ^2
+
+Derivative:
+∇θ J(θ) = 4 - 2θ
+
+At θ = 2:
+∇θ J(2) = 4 - 2(2) = 0</div>
+              <p>
+                The gradient is 0, so <code>θ = 2</code> is already at the peak. No update is needed.
+              </p>
+              <p>Now start at <code>θ = 1</code> instead:</p>
+              <div class="formula">∇θ J(1) = 4 - 2(1) = 2
+
+Ascent update:
+θ ← θ + η ∇θ J(θ)
+θ ← 1 + 0.1(2) = 1.2</div>
+              <p>
+                Since the gradient is positive, increasing <code>θ</code> improves reward, so ascent moves
+                <code>θ</code> upward from 1 to 1.2.
+              </p>
+            </div>
+            <div class="card">
+              <h4>Gradient Descent</h4>
+              <p>We want to minimize prediction error:</p>
+              <div class="formula">L(θ) = (θ - 3)^2
+
+Derivative:
+∇θ L(θ) = 2(θ - 3)
+
+At θ = 1:
+∇θ L(1) = 2(1 - 3) = -4</div>
+              <p>Use descent, so subtract the gradient:</p>
+              <div class="formula">Descent update:
+θ ← θ - η ∇θ L(θ)
+θ ← 1 - 0.1(-4)
+θ ← 1.4</div>
+              <p>
+                The gradient is negative. Subtracting a negative moves <code>θ</code> upward, toward the loss
+                minimum at <code>θ = 3</code>.
+              </p>
+            </div>
+          </div>
+          <div class="note">
+            <strong>Key sign rule:</strong> ascent adds the gradient because we want the objective higher.
+            Descent subtracts the gradient because we want the loss lower.
+          </div>
+        </div>
+        <div class="note">
+          <strong>RL translation:</strong> training changes <code>θ</code>, the neural-net weights, so that the
+          policy assigns higher probability to actions that led to good future return and lower probability to
+          actions that led to bad future return.
+        </div>
+
+        <h3>Maximum Likelihood</h3>
+        <p>
+          Maximum likelihood is the supervised-learning idea "make the data we actually saw have high
+          probability under the model." In classification, if the correct label is "move right," we want the model
+          to put high probability on "move right."
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>Action</th>
+              <th>Policy probability before training</th>
+              <th>Expert action?</th>
+              <th>What training should do</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>left</td>
+              <td>0.20</td>
+              <td>No</td>
+              <td>Usually push down</td>
+            </tr>
+            <tr>
+              <td>right</td>
+              <td>0.30</td>
+              <td>Yes</td>
+              <td>Push up</td>
+            </tr>
+            <tr>
+              <td>stop</td>
+              <td>0.50</td>
+              <td>No</td>
+              <td>Usually push down</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>
+          The probability of the expert action is <code>π<sub>θ</sub>(right|s) = 0.30</code>. Behavior cloning
+          updates <code>θ</code> so this number gets closer to 1 for expert examples.
+        </p>
+        <div class="formula">min_theta E_{(s,a) ~ D_expert}[-log pi_theta(a | s)]</div>
+        <div class="worked">
+          <h4>What This Equation Is Saying</h4>
+          <p>
+            Read it from the inside out. For each expert example, we look at the state <code>s</code> and the
+            action <code>a</code> the expert actually took. Then we ask the policy:
+            "What probability did you assign to that expert action?"
+          </p>
+          <table>
+            <thead>
+              <tr>
+                <th>Piece</th>
+                <th>Plain English</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>D<sub>expert</sub></code></td>
+                <td>The dataset of expert examples, like <code>(state, expert action)</code> pairs.</td>
+              </tr>
+              <tr>
+                <td><code>(s,a) ~ D<sub>expert</sub></code></td>
+                <td>Pick one expert example from the dataset.</td>
+              </tr>
+              <tr>
+                <td><code>π<sub>θ</sub>(a|s)</code></td>
+                <td>The policy's probability of the expert's action <code>a</code> in state <code>s</code>.</td>
+              </tr>
+              <tr>
+                <td><code>-log π<sub>θ</sub>(a|s)</code></td>
+                <td>The penalty. Small if the policy gave the expert action high probability; large if it did not.</td>
+              </tr>
+              <tr>
+                <td><code>𝔼</code></td>
+                <td>Average that penalty over all expert examples.</td>
+              </tr>
+              <tr>
+                <td><code>min<sub>θ</sub></code></td>
+                <td>Change the neural-net weights <code>θ</code> to make that average penalty as small as possible.</td>
+              </tr>
+            </tbody>
+          </table>
+          <p>
+            So the whole formula means: <strong>train the policy so that, across the expert dataset, the expert's
+            action gets high probability.</strong>
+          </p>
+        </div>
+        <p>
+          Why <code>-log</code>? If the model gives the expert action high probability, <code>-log(probability)</code>
+          is small. If it gives the expert action low probability, <code>-log(probability)</code> is large.
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>Probability assigned to expert action</th>
+              <th><code>-log(probability)</code></th>
+              <th>Interpretation</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>0.90</td>
+              <td>0.105</td>
+              <td>Small loss: model mostly agrees with expert</td>
+            </tr>
+            <tr>
+              <td>0.30</td>
+              <td>1.204</td>
+              <td>Medium loss</td>
+            </tr>
+            <tr>
+              <td>0.01</td>
+              <td>4.605</td>
+              <td>Large loss: model thought expert action was very unlikely</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>
+          So behavior cloning is not mysterious RL yet. It is ordinary supervised learning: input is state
+          <code>s</code>, label is expert action <code>a</code>, and the model is the policy
+          <code>π<sub>θ</sub>(a|s)</code>.
+        </p>
+
+        <h3>The Log-Derivative Trick</h3>
+        <div class="note">
+          <strong>First, ignore the name.</strong> This trick is just the bridge from "I sampled an action and saw
+          how well it worked" to "which way should I move the policy weights?"
+        </div>
+        <p>
+          In behavior cloning, an expert tells us the right action. In policy gradient RL, nobody tells us the
+          right action. We try an action, see the return, and then use this rule:
+        </p>
+        <div class="formula">Good return → make the sampled action more likely next time
+Bad return → make the sampled action less likely next time</div>
+
+        <div class="worked">
+          <h4>Worked Example: One State, Two Actions</h4>
+          <p>
+            Suppose the robot is in one state and can choose <code>right</code> or <code>left</code>. Let
+            <code>p</code> mean the policy's probability of choosing <code>right</code>.
+          </p>
+          <table>
+            <thead>
+              <tr>
+                <th>Quantity</th>
+                <th>Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>p(right)</code></td>
+                <td>0.30</td>
+              </tr>
+              <tr>
+                <td><code>p(left)</code></td>
+                <td>0.70</td>
+              </tr>
+            </tbody>
+          </table>
+          <p>
+            These are different possible rollouts, not one rollout where both actions happened. To make the
+            numbers concrete, suppose "high return" means the robot eventually reaches the goal and gets
+            <code>G = +10</code>.
+          </p>
+          <table>
+            <thead>
+              <tr>
+                <th>Sampled action</th>
+                <th>Return from that rollout</th>
+                <th>What training should do</th>
+                <th>Why</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>right</code></td>
+                <td><code>G = +10</code></td>
+                <td>Increase <code>p(right)</code></td>
+                <td><code>right</code> worked well, so make <code>right</code> more likely next time.</td>
+              </tr>
+              <tr>
+                <td><code>left</code></td>
+                <td><code>G = +10</code></td>
+                <td>Decrease <code>p(right)</code></td>
+                <td><code>left</code> worked well, so make <code>left</code> more likely. Since there are only two actions, this means lowering <code>p(right)</code>.</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="formula">If sampled action was right:
+log probability = log p
+derivative with respect to p = 1 / p
+at p = 0.30, this is positive
+with return G = +10, update pushes p upward
+
+If sampled action was left:
+log probability = log(1 - p)
+derivative with respect to p = -1 / (1 - p)
+at p = 0.30, this is negative
+with return G = +10, update pushes p downward</div>
+          <p>
+            If the return were bad instead, the signs would flip. For example, if the policy sampled
+            <code>right</code> and got <code>G = -10</code>, training would decrease <code>p(right)</code>. If it
+            sampled <code>left</code> and got <code>G = -10</code>, training would increase <code>p(right)</code>,
+            because making <code>left</code> less likely leaves more probability for <code>right</code>. In many
+            algorithms, "good" and "bad" really mean above or below a baseline, not just positive or negative.
+          </p>
+          <p>
+            That is the whole idea of <code>∇ log probability</code>: it points in the direction that would make
+            the sampled action more likely. Then reward or return tells us whether we actually want to move
+            in that direction.
+          </p>
+        </div>
+
+        <h4>Where The Equation Comes In</h4>
+        <p>
+          The policy-gradient objective is an average over possible rollouts. A rollout is random because the
+          policy samples actions. If we write one possible sampled thing as <code>x</code>, its probability is
+          <code>p<sub>θ</sub>(x)</code>. The identity is:
+        </p>
+        <div class="formula">grad_theta p_theta(x) = p_theta(x) grad_theta log p_theta(x)</div>
+        <p>
+          It says: instead of directly differentiating the probability of the sampled thing, we can differentiate
+          its log probability and multiply by its probability. This matters because "probability times something"
+          is exactly an expectation, meaning we can estimate it by sampling.
+        </p>
+        <div class="formula">Policy-gradient takeaway:
+sample a rollout
+compute how to make its sampled actions more likely: grad log probability
+multiply by how good it was: return
+update θ in that direction</div>
+
+        <h4>Why Logs Specifically?</h4>
+        <p>
+          A rollout probability is a product of action probabilities:
+        </p>
+        <div class="formula">p_theta(trajectory) =
+π_theta(a_1 | s_1) × π_theta(a_2 | s_2) × ... × π_theta(a_T | s_T)</div>
+        <p>
+          Logs turn products into sums:
+        </p>
+        <div class="formula">log p_theta(trajectory) =
+log π_theta(a_1 | s_1) + log π_theta(a_2 | s_2) + ... + log π_theta(a_T | s_T)</div>
+        <p>
+          That is why the policy-gradient formula later has a sum of
+          <code>∇ log π<sub>θ</sub>(a<sub>t</sub>|s<sub>t</sub>)</code> terms.
+        </p>
+
+        <details class="question">
+          <summary>Check: why do we use log probabilities instead of probabilities directly?</summary>
+          <div class="answer">
+            <span class="answer-label">Answer.</span>
+            Products of probabilities appear in trajectory distributions. Logs turn products into sums, so
+            <code>log p_theta(tau)</code> becomes a sum of <code>log pi_theta(a_t | s_t)</code>. Also,
+            <code>grad p = p grad log p</code> is what makes the policy-gradient estimator sampleable.
+          </div>
+        </details>
+      </section>
+
+      <section id="mdp">
+        <h2>MDPs And Rewards</h2>
+
+        <h3>The RL Setup</h3>
+        <p>An MDP, or Markov decision process, formalizes sequential decision-making.</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Symbol</th>
+              <th>Meaning</th>
+              <th>Plain English</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>s_t</code></td>
+              <td>state</td>
+              <td>the information that fully describes the world for predicting the future</td>
+            </tr>
+            <tr>
+              <td><code>o_t</code></td>
+              <td>observation</td>
+              <td>what the agent actually sees; may be partial</td>
+            </tr>
+            <tr>
+              <td><code>a_t</code></td>
+              <td>action</td>
+              <td>the decision made by the agent</td>
+            </tr>
+            <tr>
+              <td><code>p(s_{t+1} | s_t, a_t)</code></td>
+              <td>dynamics</td>
+              <td>how the world changes after an action</td>
+            </tr>
+            <tr>
+              <td><code>r(s_t, a_t)</code></td>
+              <td>reward</td>
+              <td>the scalar score for what just happened</td>
+            </tr>
+            <tr>
+              <td><code>pi(a | s)</code></td>
+              <td>policy</td>
+              <td>the agent's behavior rule</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="formula">Trajectory:
+tau = (s_1, a_1, s_2, a_2, ..., s_T, a_T)
+
+Trajectory distribution:
+p_theta(tau) = p(s_1) prod_t pi_theta(a_t | s_t) p(s_{t+1} | s_t, a_t)
+
+RL objective:
+J(theta) = E_{tau ~ p_theta(tau)}[sum_t r(s_t, a_t)]</div>
+
+        <h3>Discounting</h3>
+        <p>
+          A discounted return is <code>G_t = r_t + gamma r_{t+1} + gamma^2 r_{t+2} + ...</code>.
+          Smaller <code>gamma</code> values make delayed rewards matter less. Larger values make the agent
+          care more about long-term outcomes.
+        </p>
+
+        <div class="trap">
+          <strong>Practice trap.</strong> With a sparse terminal reward of +1 for success, increasing
+          <code>gamma</code> does not favor speed. It makes slow success less punished. To favor quick success,
+          decrease <code>gamma</code> or add an explicit time penalty.
+        </div>
+
+        <h3>Dense Rewards And Shaping</h3>
+        <p>
+          Dense rewards can make learning much easier because they provide feedback before the terminal event.
+          But a dense progress reward is not automatically policy-preserving. It can make the agent chase local
+          progress, avoid necessary detours, or prefer risky shortcuts. The special case that is known to preserve
+          optimal policies is potential-based shaping, which adds a difference of potentials rather than an arbitrary
+          progress bonus.
+        </p>
+        <div class="formula">Potential-based shaping idea:
+r'(s,a,s') = r(s,a,s') + gamma Phi(s') - Phi(s)
+
+Intuition:
+the shaping terms telescope over time, so they guide learning without changing which full trajectories are optimal.</div>
+
+        <h3>Reward Transformations</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Change</th>
+              <th>Always preserves optimal policy?</th>
+              <th>Reason</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Multiply every reward by positive constant <code>c &gt; 0</code></td>
+              <td>Yes</td>
+              <td>All policy values and Q-values are scaled by <code>c</code>; action ordering is unchanged.</td>
+            </tr>
+            <tr>
+              <td>Add constant forever in infinite-horizon discounted continuing task</td>
+              <td>Yes</td>
+              <td>Every policy receives the same extra <code>c / (1 - gamma)</code>.</td>
+            </tr>
+            <tr>
+              <td>Add constant per step in episodic task with variable length</td>
+              <td>No</td>
+              <td>Positive constant becomes a survival bonus; negative constant becomes a time penalty.</td>
+            </tr>
+            <tr>
+              <td>Change <code>gamma</code></td>
+              <td>No</td>
+              <td>It changes the tradeoff between sooner and later rewards.</td>
+            </tr>
+            <tr>
+              <td>Apply nonlinear increasing transform to each reward</td>
+              <td>No</td>
+              <td>RL optimizes sums of rewards, not individual reward rankings.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <details class="question">
+          <summary>Check: two trajectories have rewards [1, 1, 4] and [2, 2, 2]. Before and after squaring, which is better?</summary>
+          <div class="answer">
+            <span class="answer-label">Answer.</span>
+            Before squaring, both total 6. After squaring, the totals are 1 + 1 + 16 = 18 and
+            4 + 4 + 4 = 12. A nonlinear increasing transform changed the trajectory ordering.
+          </div>
+        </details>
+      </section>
+
+      <section id="imitation">
+        <h2>Imitation Learning</h2>
+
+        <h3>Behavior Cloning</h3>
+        <p>
+          Behavior cloning is supervised learning on expert demonstrations. Dataset
+          <code>D_expert</code> contains state-action pairs from an expert. The policy learns
+          <code>pi_theta(a | s)</code>.
+        </p>
+        <div class="formula">Behavior cloning objective:
+min_theta E_{(s,a) ~ D_expert}[-log pi_theta(a | s)]</div>
+        <p>
+          If actions are continuous and the policy is Gaussian, this often looks like squared-error regression.
+          If actions are discrete, it looks like cross-entropy classification.
+        </p>
+
+        <h3>Why Simple Regression Can Fail</h3>
+        <p>
+          Expert actions can be multi-modal. In driving, the expert might go left or right around an obstacle.
+          Squared-error regression may average those modes and produce "go straight into the obstacle."
+          The lecture's fix is expressive policy distributions: categorical distributions, Gaussian mixtures,
+          autoregressive policies, diffusion policies, or flow matching.
+        </p>
+
+        <h3>Flow Matching For Policies</h3>
+        <p>
+          The reference sheet includes flow matching because it is one way to represent a rich action distribution.
+          The idea is to start from noise <code>a_{t,0}</code> and learn a velocity field that transports it toward
+          a real action <code>a_t</code>.
+        </p>
+        <div class="formula">ODE:
+d a_{t,tau} / d tau = v_theta(s_t, a_{t,tau}, tau)
+
+Euler integration with n steps:
+a_{t,tau + 1/n} = a_{t,tau} + (1/n) v_theta(s_t, a_{t,tau}, tau)
+
+Flow matching loss:
+L_FM(theta) = (1/|D|) sum_{(s_t,a_t) in D}
+  || v_theta(s_t, a_{t,tau}, tau) - (a_t - a_{t,0}) ||_2^2</div>
+
+        <h3>Compounding Errors</h3>
+        <p>
+          In offline behavior cloning, the learned policy trains only on expert states. At test time it may make
+          a small mistake, visit states the expert never visited, and then make bigger mistakes. This is distribution
+          shift caused by the policy's own errors.
+        </p>
+
+        <h3>DAgger And Online Interventions</h3>
+        <p>
+          DAgger-style methods reduce compounding errors by collecting data where the learned policy actually
+          goes. Roll out the policy, ask the expert to label or intervene at encountered states, aggregate the data,
+          and retrain. This is stronger than pure offline BC, but requires online execution and expert access.
+        </p>
+
+        <details class="question">
+          <summary>Check: why can behavior cloning fail even if validation loss on expert data is low?</summary>
+          <div class="answer">
+            <span class="answer-label">Answer.</span>
+            Validation loss measures expert-distribution states. Deployment states come from the learned policy.
+            A tiny action error can move the agent into unfamiliar states, where the supervised model has no
+            reason to be accurate.
+          </div>
+        </details>
+      </section>
+
+      <section id="pg">
+        <h2>Policy Gradients</h2>
+
+        <h3>The Big Idea</h3>
+        <p>
+          Policy gradient is trial-and-error learning. Sample actions from the current policy. If a trajectory gets
+          high reward, increase the probability of actions in that trajectory. If it gets low reward, decrease them.
+        </p>
+
+        <div class="formula">Vanilla REINFORCE:
+grad_theta J(theta) =
+E_{tau ~ p_theta(tau)}[
+  (sum_t grad_theta log pi_theta(a_t | s_t)) (sum_t r_t)
+]</div>
+
+        <h3>Why The Dynamics Disappear</h3>
+        <p>
+          The trajectory probability includes environment terms:
+        </p>
+        <div class="formula">p_theta(tau) = p(s_1) prod_t pi_theta(a_t | s_t) p(s_{t+1} | s_t, a_t)</div>
+        <p>
+          But <code>p(s_1)</code> and <code>p(s_{t+1} | s_t, a_t)</code> do not depend on <code>theta</code>.
+          Therefore, their gradients are zero. The policy-gradient estimator only needs
+          <code>grad log pi_theta(a_t | s_t)</code>.
+        </p>
+
+        <h3>Causality: Reward-To-Go</h3>
+        <p>
+          Action <code>a_t</code> cannot affect rewards before time <code>t</code>. So we replace total return with
+          future return:
+        </p>
+        <div class="formula">With causality:
+grad_theta J(theta) =
+E[
+  sum_t grad_theta log pi_theta(a_t | s_t)
+  (sum_{t' = t}^T r_{t'} - b)
+]</div>
+        <p>This keeps the expected gradient correct and usually reduces variance.</p>
+
+        <h3>Baselines</h3>
+        <p>
+          A baseline subtracts predictable reward so the gradient focuses on better-than-expected actions.
+          The key rule from the practice questions:
+        </p>
+        <div class="note">
+          A baseline is unbiased if, after conditioning on <code>s_t</code>, it does not depend on the sampled
+          action <code>a_t</code>. It can be wrong or poorly trained and still be unbiased. It may just fail to reduce
+          variance.
+        </div>
+
+        <div class="formula">Why state-only baseline is unbiased:
+E_{a ~ pi(.|s)}[grad log pi(a|s) b(s)]
+= b(s) sum_a grad pi(a|s)
+= b(s) grad 1
+= 0</div>
+
+        <details class="question">
+          <summary>Check: which baselines are valid: V(s_t), E_a[Q(s_t,a)], Q(s_t,a_t), or a bad neural net c(s_t)?</summary>
+          <div class="answer">
+            <span class="answer-label">Answer.</span>
+            Valid: <code>V(s_t)</code>, <code>E_a[Q(s_t,a)]</code>, and <code>c(s_t)</code>. Invalid in general:
+            <code>Q(s_t,a_t)</code>, because it depends on the sampled action.
+          </div>
+        </details>
+
+        <h3>Bias And Variance</h3>
+        <p>
+          Bias means the estimator is wrong on average. Variance means it changes a lot across samples.
+          In RL, a high-variance unbiased gradient may still be hard to learn from.
+        </p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Trick</th>
+              <th>Effect</th>
+              <th>Why</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Reward-to-go</td>
+              <td>Lower variance, no bias</td>
+              <td>Removes rewards that the action could not have caused.</td>
+            </tr>
+            <tr>
+              <td>State baseline</td>
+              <td>Usually lower variance, no bias</td>
+              <td>Subtracts state-dependent expected return.</td>
+            </tr>
+            <tr>
+              <td>Action-dependent baseline</td>
+              <td>Can bias</td>
+              <td>Its expected score-function term is not generally zero.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>On-Policy Versus Off-Policy</h3>
+        <p>
+          Vanilla policy gradient is on-policy: rollouts must come from the current policy. If data comes from
+          an older policy, importance sampling can correct it:
+        </p>
+        <div class="formula">Importance ratio:
+rho_t(theta') = pi_{theta'}(a_t | s_t) / pi_theta(a_t | s_t)</div>
+        <p>
+          But large ratios cause high variance and unstable updates. That motivates KL constraints and PPO.
+        </p>
+      </section>
+
+      <section id="actor-critic">
+        <h2>Actor-Critic And PPO</h2>
+
+        <h3>Value, Q, And Advantage</h3>
+        <div class="formula">V^pi(s) = expected future reward from state s, then follow pi
+Q^pi(s,a) = expected future reward from state s, take action a, then follow pi
+A^pi(s,a) = Q^pi(s,a) - V^pi(s)</div>
+        <p>
+          The actor is the policy. The critic is the value or Q estimator. The actor asks, "What should I do?"
+          The critic answers, "Was that action better or worse than expected?"
+        </p>
+
+        <div class="formula">Actor-critic policy gradient:
+grad_theta J(theta) approx (1/N) sum_i sum_t
+  grad_theta log pi_theta(a_{i,t} | s_{i,t}) * A_hat(s_{i,t}, a_{i,t})</div>
+
+        <h3>Estimating Values</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Estimator</th>
+              <th>Formula idea</th>
+              <th>Bias / variance</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Monte Carlo</td>
+              <td>Use actual future return from rollout</td>
+              <td>Low bias, high variance, waits until trajectory data exists</td>
+            </tr>
+            <tr>
+              <td>1-step TD</td>
+              <td><code>r_t + gamma V_hat(s_{t+1})</code></td>
+              <td>More bias from bootstrap, lower variance</td>
+            </tr>
+            <tr>
+              <td>n-step</td>
+              <td>Use n real rewards, then bootstrap</td>
+              <td>Middle ground</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="formula">1-step advantage estimate:
+A_hat(s_t,a_t) approx r_t + gamma V_hat(s_{t+1}) - V_hat(s_t)</div>
+
+        <h3>GAE</h3>
+        <p>
+          Generalized advantage estimation averages advantage estimates with different horizons.
+          Short horizons have lower variance but more bootstrap bias. Long horizons have lower bootstrap bias
+          but more rollout variance. GAE blends them with weights controlled by <code>lambda</code>.
+        </p>
+        <div class="formula">n-step advantage:
+A_hat_n(s_t,a_t) =
+  sum_{t'=t}^{t+n} gamma^{t'-t} r_{t'}
+  - V_hat(s_t) + gamma^n V_hat(s_{t+n})
+
+GAE:
+A_hat_GAE = sum_n w_n A_hat_n, where w_n proportional to lambda^{n-1}</div>
+
+        <h3>PPO</h3>
+        <p>
+          PPO lets you take multiple gradient steps on a batch while preventing the new policy from moving too far.
+          It does this by clipping the importance ratio.
+        </p>
+        <div class="formula">ratio:
+r_t(theta') = pi_{theta'}(a_t | s_t) / pi_theta(a_t | s_t)
+
+PPO clipped surrogate:
+sum_{i,t} min(
+  r_t(theta') A_hat_t,
+  clip(r_t(theta'), 1 - eps, 1 + eps) A_hat_t
+)</div>
+        <p>
+          If an update would make the policy probability change too much in a way that improves the surrogate,
+          clipping removes the extra incentive.
+        </p>
+
+        <details class="question">
+          <summary>Check: if advantage is positive, what does PPO clipping prevent?</summary>
+          <div class="answer">
+            <span class="answer-label">Answer.</span>
+            It prevents increasing the probability of that action by more than about <code>1 + eps</code> within
+            the surrogate objective. The policy can still change, but the objective stops rewarding excessive
+            probability increases on that sample.
+          </div>
+        </details>
+
+        <h3>Off-Policy Actor-Critic Beyond PPO</h3>
+        <p>
+          PPO is only mildly off-policy: it reuses a recent batch for several gradient steps and controls drift.
+          Fully off-policy actor-critic methods, such as SAC-style methods, keep a replay buffer and learn a
+          critic from older data. The policy can then be improved using the critic instead of only using fresh
+          reward-to-go estimates.
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>Ingredient</th>
+              <th>What changes from vanilla policy gradient?</th>
+              <th>Why it helps</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Replay buffer</td>
+              <td>Train on transitions from many past policies</td>
+              <td>Better sample efficiency, especially when real-world rollouts are expensive</td>
+            </tr>
+            <tr>
+              <td>Q critic</td>
+              <td>Estimate <code>Q^pi(s,a)</code> with TD-style bootstrapping</td>
+              <td>Gives a reusable estimate of action quality</td>
+            </tr>
+            <tr>
+              <td>Policy update through Q</td>
+              <td>Increase probability of actions the critic rates highly</td>
+              <td>Avoids waiting for full rollout returns every update</td>
+            </tr>
+            <tr>
+              <td>Importance weights or constraints</td>
+              <td>Correct or limit mismatch between data policy and current policy</td>
+              <td>Controls bias and instability from stale data</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>
+          The tradeoff is standard for this course: more off-policy reuse improves data efficiency but creates
+          more distribution mismatch. PPO is stable and easy to use; replay-buffer actor-critic methods are
+          more data-efficient but more sensitive to critic quality and implementation details.
+        </p>
+      </section>
+
+      <section id="qlearning">
+        <h2>Q-Learning And DQN</h2>
+
+        <h3>From Policy Evaluation To Optimal Control</h3>
+        <p>
+          Actor-critic estimates <code>Q^pi</code> for the current policy. Q-learning tries to estimate
+          <code>Q*</code>, the Q-value of the optimal policy, directly.
+        </p>
+        <div class="formula">Bellman equation for a fixed policy:
+Q^pi(s,a) = r(s,a) + gamma E_{s', a' ~ pi(.|s')}[Q^pi(s',a')]
+
+Bellman optimality equation:
+Q*(s,a) = r(s,a) + gamma E_{s'}[max_{a'} Q*(s',a')]</div>
+
+        <h3>Q-Learning Target And Loss</h3>
+        <div class="formula">1-step Q-learning target:
+y_i = r_i + gamma max_{a'} Q_hat_phi(s'_i, a')
+
+Q-learning loss:
+L(phi) = (1/N) sum_i || Q_hat_phi(s_i,a_i) - y_i ||^2</div>
+        <p>
+          Once <code>Q_hat</code> is good, the policy is greedy:
+          choose <code>argmax_a Q_hat(s,a)</code>.
+        </p>
+
+        <h3>Why DQN Needs Stabilizers</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Stabilizer</th>
+              <th>What it does</th>
+              <th>Practice-problem wording</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Replay buffer</td>
+              <td>Stores past transitions and samples random mini-batches</td>
+              <td>Breaks temporal correlation and reuses data for efficiency</td>
+            </tr>
+            <tr>
+              <td>Target network</td>
+              <td>Computes target with a frozen or slowly updated copy of Q</td>
+              <td>Stops the network from chasing a target that moves every gradient step</td>
+            </tr>
+            <tr>
+              <td>Exploration</td>
+              <td>Epsilon-greedy or Boltzmann action sampling</td>
+              <td>Gets coverage of more state-action pairs</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="trap">
+          <strong>Practice trap.</strong> The online and target networks are not kept identical throughout
+          training. If they were identical, the bootstrapped label would move with every update.
+        </div>
+
+        <h3>Overestimation And Double DQN</h3>
+        <p>
+          The <code>max</code> in Q-learning tends to select actions whose values are overestimated by noise.
+          Double DQN separates action selection from action evaluation: use one network to pick the best action
+          and another to evaluate it.
+        </p>
+
+        <h3>n-Step Q-Learning</h3>
+        <div class="formula">n-step Q target:
+y_{i,t}^{(n)} =
+  sum_{t'=t}^{t+n-1} gamma^{t'-t} r_{i,t'}
+  + gamma^n max_a Q_hat(s_{i,t+n}, a)</div>
+        <p>
+          Larger <code>n</code> uses more observed rewards before bootstrapping. This reduces dependence on
+          inaccurate early Q-values, but increases variance and can introduce off-policy bias.
+        </p>
+
+        <details class="question">
+          <summary>Check: why is 1-step Q-learning naturally compatible with off-policy replay?</summary>
+          <div class="answer">
+            <span class="answer-label">Answer.</span>
+            After observing <code>(s_t, a_t, r_t, s_{t+1})</code>, the next action in the target is chosen by
+            <code>max_a Q(s_{t+1},a)</code>, not by the action actually taken next in the replay trajectory.
+            For <code>n &gt; 1</code>, intermediate rewards depend on behavior-policy actions in the buffer.
+          </div>
+        </details>
+      </section>
+
+      <section id="offline">
+        <h2>Offline RL</h2>
+
+        <h3>The Problem</h3>
+        <p>
+          Offline RL trains only on a fixed dataset <code>D</code> collected by a behavior policy
+          <code>pi_beta</code>. You cannot collect new rollouts. The goal is to learn a better policy
+          <code>pi_theta</code>.
+        </p>
+
+        <h3>Why Not Just Use Off-Policy Q-Learning?</h3>
+        <p>
+          A learned policy may choose actions not represented in the dataset. The Q-function may be wildly
+          wrong there. Maximizing over those unseen actions creates overestimation and bad policies.
+        </p>
+
+        <div class="note">
+          Offline RL has one recurring principle: improve the policy while staying close to actions supported
+          by the data.
+        </div>
+
+        <h3>Filtered Behavior Cloning</h3>
+        <p>
+          Keep the top-return trajectories and behavior-clone them. This is simple but crude: it ignores the
+          fact that some good actions may appear inside medium-return trajectories.
+        </p>
+        <details class="question">
+          <summary>Check: returns are {3, 9, 1, 7, 5}. If you keep the top 2 trajectories, what is their mean return?</summary>
+          <div class="answer">
+            <span class="answer-label">Answer.</span>
+            Top two returns are 9 and 7, so the mean is <code>(9 + 7) / 2 = 8</code>.
+          </div>
+        </details>
+
+        <h3>AWR: Advantage-Weighted Regression</h3>
+        <p>
+          AWR turns imitation learning into weighted imitation: copy dataset actions more strongly when their
+          estimated advantage is high.
+        </p>
+        <div class="formula">AWR objective:
+max_theta E_{(s,a) ~ D}[
+  log pi_theta(a | s) exp((1/alpha) A_hat(s,a))
+]</div>
+        <p>
+          Good: policy is trained only on dataset actions, so it avoids querying OOD actions. Weakness:
+          basic AWR uses Monte Carlo returns, which can be high variance, and its advantages are tied to
+          the behavior policy <code>pi_beta</code>.
+        </p>
+
+        <h3>IQL: Implicit Q-Learning</h3>
+        <p>
+          IQL addresses AWR's weaknesses without explicitly maximizing over out-of-dataset actions.
+          It learns <code>V</code> with an asymmetric expectile loss, learns <code>Q</code> by bootstrapping to
+          <code>V</code>, then extracts a policy with AWR-style weighted behavior cloning.
+        </p>
+        <div class="formula">Expectile loss for residual x = V(s) - Q(s,a):
+ell_lambda^2(x) =
+  (1 - lambda) x^2   if x &lt; 0
+  lambda x^2         if x &gt;= 0
+
+IQL value fit:
+V_hat(s) &lt;- argmin_V E_{(s,a)~D}[ell_lambda^2(V(s) - Q_hat(s,a))]
+
+IQL Q update:
+Q_hat(s,a) &lt;- argmin_Q E[(Q(s,a) - (r + gamma V_hat(s')))^2]
+
+Policy extraction:
+pi_hat &lt;- argmax_pi E_{(s,a)~D}[
+  log pi(a|s) exp((1/alpha)(Q_hat(s,a) - V_hat(s)))
+]</div>
+
+        <div class="trap">
+          <strong>Upper expectile convention in the reference sheet.</strong> The sheet says upper expectile uses
+          <code>lambda &lt; 1/2</code> because the residual is defined as <code>x = V(s) - Q(s,a)</code>. With this
+          sign convention, under-placing <code>V</code> relative to high <code>Q</code> values is penalized more.
+        </div>
+
+        <details class="question">
+          <summary>Check: what two AWR weaknesses does IQL address?</summary>
+          <div class="answer">
+            <span class="answer-label">Answer.</span>
+            Basic AWR's Monte Carlo returns can be high-variance, and its advantages are tied to the behavior
+            policy <code>pi_beta</code>. IQL uses TD-style learning and estimates values for a better policy within
+            dataset support.
+          </div>
+        </details>
+      </section>
+
+      <section id="reward">
+        <h2>Reward Learning And RLHF</h2>
+
+        <h3>Where Do Rewards Come From?</h3>
+        <p>
+          Many real tasks do not come with a clean reward function. Reward learning tries to infer a reward from
+          goal examples, demonstrations, classifier labels, or human preferences.
+        </p>
+
+        <h3>Goal Classifiers</h3>
+        <p>
+          If you can collect examples of successful and unsuccessful states, train a classifier
+          <code>C(s)</code> that predicts success. Use its output as a reward signal. This gives dense feedback
+          if the classifier can generalize.
+        </p>
+
+        <h3>Preference Learning</h3>
+        <p>
+          Humans often find pairwise comparisons easier than calibrated scalar ratings. Instead of asking
+          "what reward score is this trajectory?", ask "which trajectory is better?"
+        </p>
+        <div class="formula">Trajectory reward:
+r_theta(tau) = sum_{(s,a) in tau} r_theta(s,a)
+
+Bradley-Terry preference model:
+P_theta(tau_w preferred to tau_l)
+  = sigmoid(r_theta(tau_w) - r_theta(tau_l))
+
+Reward model objective:
+max_theta E_{(tau_w,tau_l)}[
+  log sigmoid(r_theta(tau_w) - r_theta(tau_l))
+]</div>
+
+        <h3>RLHF Pipeline</h3>
+        <ol>
+          <li>Start from a pretrained or instruction-tuned language model.</li>
+          <li>Generate multiple responses for prompts.</li>
+          <li>Collect human pairwise preferences.</li>
+          <li>Train a reward model to predict preference labels.</li>
+          <li>Use RL, often PPO-style, to optimize the language model against the learned reward, usually with a KL penalty to stay close to the original model.</li>
+        </ol>
+
+        <h3>DPO</h3>
+        <p>
+          Direct Preference Optimization avoids training an explicit reward model and running an RL loop.
+          It turns preference data directly into a classification-style objective for the policy. The lecture frames
+          it as simpler and effective, but less able to leverage online data.
+        </p>
+
+        <h3>Failure Modes</h3>
+        <ul>
+          <li>Humans can be inconsistent.</li>
+          <li>Reward models can be wrong outside the comparison data.</li>
+          <li>Optimizing a learned reward too hard can exploit reward-model errors.</li>
+          <li>KL penalties and reference models limit drift but do not make the reward perfect.</li>
+        </ul>
+
+        <details class="question">
+          <summary>Check: why prefer pairwise preferences over scalar reward labels?</summary>
+          <div class="answer">
+            <span class="answer-label">Answer.</span>
+            Pairwise comparisons are usually easier and more consistent for humans than assigning calibrated
+            scalar scores. The reason is human judgment quality, not a generic theorem about lower variance.
+          </div>
+        </details>
+      </section>
+
+      <section id="reasoning">
+        <h2>RL For LLM Reasoning</h2>
+
+        <p>
+          The reasoning lecture connects RL to test-time compute. A model can improve answers not only by
+          having better weights, but by spending more inference compute on planning, search, or verification.
+        </p>
+
+        <div class="grid">
+          <div class="card">
+            <h3>Chain Of Thought And Majority Vote</h3>
+            <p>
+              Sample multiple reasoning traces, score or verify them, and choose an answer by consensus or
+              by a verifier. This is test-time search over candidate solutions.
+            </p>
+          </div>
+          <div class="card">
+            <h3>GRPO-Style Training</h3>
+            <p>
+              Group Relative Policy Optimization compares multiple sampled completions for the same prompt
+              and uses relative scores within the group as the learning signal. The high-level idea is advantage
+              estimation without a separate value model.
+            </p>
+          </div>
+        </div>
+
+        <p>
+          Exam relevance is likely conceptual: RL is used to teach policies to produce better reasoning traces
+          when rewards are verifiable, and test-time compute changes how we evaluate capability.
+        </p>
+      </section>
+
+      <section id="mbrl">
+        <h2>Model-Based RL</h2>
+
+        <h3>Core Idea</h3>
+        <p>
+          Model-based RL learns or uses a model of the world, usually
+          <code>p_theta(s_{t+1} | s_t, a_t)</code>. Sometimes it also learns a reward model
+          <code>r_theta(s_t,a_t)</code>.
+        </p>
+
+        <div class="formula">Dynamics model:
+p_theta(s_{t+1} | s_t, a_t)
+
+Reward model:
+r_theta(s_t, a_t)</div>
+
+        <h3>Use 1: Generate Synthetic Data</h3>
+        <p>
+          Dyna-style model-based policy optimization alternates between collecting real data, fitting the model,
+          rolling out the model to create synthetic transitions, and training a model-free RL algorithm on real plus
+          synthetic data.
+        </p>
+        <div class="note">
+          Model rollouts should often be short and start from real states in the replay buffer. Long model rollouts
+          compound model error.
+        </div>
+
+        <h3>Use 2: Planning At Test Time</h3>
+        <p>
+          The planner itself can be the policy. At state <code>s_t</code>, sample candidate action sequences, roll them
+          out in the learned model, score them, execute the first action of the best sequence, then replan next step.
+        </p>
+        <div class="formula">Model rollout setup:
+sample N action sequences a^i_{t:t+H}
+roll them out with p_theta to get s_hat^i_{t+1:t+H+1}
+
+Planning V1:
+i* = argmax_i sum_{t'=t}^{t+H} r(s_hat^i_{t'}, a^i_{t'})
+
+Planning V2:
+i* = argmax_i [
+  sum_{t'=t}^{t+H} r(s_hat^i_{t'}, a^i_{t'})
+  + V_hat(s_hat^i_{t+H+1})
+]</div>
+
+        <h3>Why Greedy One-Step Reward Is Not Enough</h3>
+        <p>
+          Choosing <code>argmax_a r_theta(s_t,a)</code> ignores future consequences. The pancake robot from the
+          practice problem might get immediate syrup reward while ruining the final pattern. Planning uses
+          multi-step predicted return.
+        </p>
+
+        <h3>Why Exact Dynamic Programming Is Usually Intractable</h3>
+        <p>
+          If states are images or continuous robot configurations, you cannot enumerate all possible
+          <code>(s,a)</code> pairs. A discrete action space does not make the state space small.
+        </p>
+
+        <details class="question">
+          <summary>Check: for a high-dimensional kitchen robot with learned transition and reward models, which are plausible: one-step greedy, sampling-based planning, exact DP over all images, synthetic rollouts?</summary>
+          <div class="answer">
+            <span class="answer-label">Answer.</span>
+            Plausible: sampling-based planning with replanning, and synthetic rollouts for model-free training.
+            Not generally plausible: one-step greedy reward, exact DP over all image states, or exact backward
+            search from the final image.
+          </div>
+        </details>
+      </section>
+
+      <section id="multitask">
+        <h2>Multi-Task And Goal-Conditioned RL</h2>
+
+        <h3>Multi-Task RL</h3>
+        <p>
+          Instead of one MDP, we have a task distribution. Tasks may differ in rewards, dynamics, initial states,
+          action spaces, or goals. The key practical idea is to condition the policy on the task.
+        </p>
+        <div class="formula">Task-conditioned policy:
+pi_theta(a | s, z)
+
+where z can be a task ID, goal state, instruction, desired object, user ID, etc.</div>
+
+        <h3>Why Share Across Tasks?</h3>
+        <ul>
+          <li>Shared representations can reduce sample complexity.</li>
+          <li>Data from one task may teach dynamics or skills useful for another.</li>
+          <li>But imbalanced data can cause common tasks to dominate training, so stratified sampling can help.</li>
+        </ul>
+
+        <h3>Goal-Conditioned RL</h3>
+        <p>
+          Goal-conditioned RL is a special case where <code>z</code> is a goal, often a goal state
+          <code>s_g</code>. The policy learns <code>pi(a | s, s_g)</code>.
+        </p>
+
+        <h3>Hindsight Relabeling / HER</h3>
+        <p>
+          If an episode failed at its intended goal but reached some other state, relabel that reached state as
+          the goal and train as if the episode succeeded for that alternate goal.
+        </p>
+        <div class="note">
+          Hindsight relabeling needs compatible dynamics across goals or tasks and is naturally paired with
+          off-policy algorithms using a replay buffer.
+        </div>
+
+        <details class="question">
+          <summary>Check: when is hindsight relabeling valid?</summary>
+          <div class="answer">
+            <span class="answer-label">Answer.</span>
+            When the same trajectory can be reinterpreted under a different goal or task without changing the
+            dynamics. You can relabel rewards and the task identifier, store the relabeled transition in replay,
+            and train off-policy.
+          </div>
+        </details>
+      </section>
+
+      <section id="reference">
+        <h2>Reference Sheet Decoded</h2>
+        <p>
+          The exam gives you formulas. Your job is to know when each applies and what each symbol means.
+          This section translates the provided reference sheet into decision rules.
+        </p>
+
+        <h3>Imitation Learning</h3>
+        <div class="formula">min_theta E_{(s,a) ~ D_expert}[-log pi_theta(a|s)]</div>
+        <p>Use when you have expert state-action pairs and want to clone the expert.</p>
+
+        <div class="formula">Flow matching:
+d a_{t,tau}/d tau = v_theta(s_t, a_{t,tau}, tau)
+a_{t,tau+1/n} = a_{t,tau} + (1/n) v_theta(...)
+L_FM = average squared error to (a_t - a_{t,0})</div>
+        <p>Use when discussing expressive action distributions and generative policy models.</p>
+
+        <h3>Policy Gradients</h3>
+        <div class="formula">J(theta) = E_{tau ~ p_theta(tau)}[sum_t r(s_t,a_t)]
+p_theta(tau) = p(s_1) prod_t pi_theta(a_t|s_t) p(s_{t+1}|s_t,a_t)
+grad p = p grad log p
+
+REINFORCE:
+E[(sum_t grad log pi_theta(a_t|s_t)) (sum_t r_t)]
+
+Causality + baseline:
+E[sum_t grad log pi_theta(a_t|s_t) (sum_{t'=t}^T r_{t'} - b)]</div>
+        <p>Use to reason about credit assignment, baselines, and why dynamics terms vanish.</p>
+
+        <h3>Actor-Critic</h3>
+        <div class="formula">A^pi(s,a) = Q^pi(s,a) - V^pi(s)
+grad J approx average sum_t grad log pi(a_t|s_t) A_hat(s_t,a_t)
+A_hat_1 approx r_t + gamma V_hat(s_{t+1}) - V_hat(s_t)</div>
+        <p>Use when a learned value function replaces raw reward-to-go.</p>
+
+        <h3>PPO And GAE</h3>
+        <div class="formula">GAE blends n-step advantage estimates with weights proportional to lambda^{n-1}.
+
+PPO uses:
+min(ratio * A_hat, clip(ratio, 1-eps, 1+eps) * A_hat)</div>
+        <p>Use when reusing data for multiple steps without allowing very large policy updates.</p>
+
+        <h3>Q-Learning</h3>
+        <div class="formula">1-step target:
+y_i = r_i + gamma max_{a'} Q_hat(s'_i,a')
+
+n-step target:
+y_{i,t}^{(n)} =
+sum_{t'=t}^{t+n-1} gamma^{t'-t} r_{i,t'}
++ gamma^n max_a Q_hat(s_{i,t+n},a)</div>
+        <p>Use for value-based methods and DQN. Remember the off-policy issue for <code>n &gt; 1</code>.</p>
+
+        <h3>Offline RL</h3>
+        <div class="formula">AWR:
+max_theta E_D[log pi_theta(a|s) exp((1/alpha) A_hat(s,a))]
+
+IQL expectile loss:
+x = V_hat(s) - Q_hat(s,a)
+ell_lambda^2(x) = (1-lambda)x^2 if x&lt;0, else lambda x^2</div>
+        <p>Use when the policy is trained only on dataset actions and values are learned without OOD maximization.</p>
+
+        <h3>Reward Learning</h3>
+        <div class="formula">P(tau_w preferred to tau_l)
+= sigmoid(r_theta(tau_w) - r_theta(tau_l))
+
+max_theta E[log sigmoid(r_theta(tau_w) - r_theta(tau_l))]</div>
+        <p>Use for pairwise preference learning and RLHF reward models.</p>
+
+        <h3>Model-Based RL</h3>
+        <div class="formula">Planning V1:
+choose action sequence with largest predicted finite-horizon reward
+
+Planning V2:
+finite-horizon reward + terminal value V_hat(s_{t+H+1})</div>
+        <p>Use when the agent has learned or known dynamics and can evaluate candidate futures.</p>
+      </section>
+
+      <section id="practice">
+        <h2>Practice Problem Patterns</h2>
+
+        <div class="worked">
+          <h3>Pattern 1: Reward Transformations</h3>
+          <p>
+            Ask: does this transform add the same constant or positive scale to every policy's return?
+            If yes, policy ordering is preserved. If it changes time preference, episode length incentive, or
+            sums nonlinearly, policy can change.
+          </p>
+        </div>
+
+        <div class="worked">
+          <h3>Pattern 2: Baseline Validity</h3>
+          <p>
+            Condition on <code>s_t</code>. If the baseline still depends on the sampled action <code>a_t</code>,
+            it can bias the gradient. If it depends only on state, prompt prefix, time, or a frozen model reading
+            the prefix, it is unbiased even if inaccurate.
+          </p>
+        </div>
+
+        <div class="worked">
+          <h3>Pattern 3: DQN Stability</h3>
+          <p>
+            Replay buffer gives decorrelation and data reuse. Target network gives a slower moving label.
+            Both are about making bootstrapped neural-network regression less unstable.
+          </p>
+        </div>
+
+        <div class="worked">
+          <h3>Pattern 4: n-Step Returns</h3>
+          <p>
+            More observed rewards means less bootstrap bias and often faster early learning. But in replay data,
+            those intermediate rewards came from behavior-policy actions, so large <code>n</code> can introduce
+            off-policy bias.
+          </p>
+        </div>
+
+        <div class="worked">
+          <h3>Pattern 5: Offline RL And IQL</h3>
+          <p>
+            If a method maximizes over arbitrary actions, ask whether those actions are in the offline data.
+            If not, beware OOD overestimation. AWR and IQL keep policy training on dataset actions.
+          </p>
+        </div>
+
+        <div class="worked">
+          <h3>Pattern 6: RLHF Preferences</h3>
+          <p>
+            Pairwise preferences are used because humans compare options more reliably than they assign
+            absolute scalar scores. Bradley-Terry converts reward differences into preference probabilities.
+          </p>
+        </div>
+
+        <div class="worked">
+          <h3>Pattern 7: Model-Based Planning</h3>
+          <p>
+            A learned reward model is not enough for good decisions. Long-term planning requires rolling out
+            dynamics. Exact DP is impossible in high-dimensional continuous/image states, but sample-based
+            planning or synthetic rollouts can be tractable.
+          </p>
+        </div>
+      </section>
+
+      <section id="final-drill">
+        <h2>Final Drill</h2>
+        <p>Use these as a last-pass self-test. You should be able to answer each without looking up the section.</p>
+
+        <div class="checklist">
+          <label><input type="checkbox"> I can define state, observation, action, policy, reward, dynamics, trajectory, return, and discount.</label>
+          <label><input type="checkbox"> I can explain why positive reward scaling preserves an optimal policy.</label>
+          <label><input type="checkbox"> I can explain why adding a per-step constant can change an episodic task.</label>
+          <label><input type="checkbox"> I can derive the policy-gradient estimator using <code>grad p = p grad log p</code>.</label>
+          <label><input type="checkbox"> I can decide whether a baseline is unbiased by checking action dependence.</label>
+          <label><input type="checkbox"> I can explain MC vs TD vs n-step targets in terms of bias and variance.</label>
+          <label><input type="checkbox"> I can write the 1-step Q-learning target and explain replay buffer plus target network.</label>
+          <label><input type="checkbox"> I can explain why n-step Q-learning can be biased off-policy.</label>
+          <label><input type="checkbox"> I can explain AWR and IQL without using OOD action maximization.</label>
+          <label><input type="checkbox"> I can explain why pairwise preferences are used in RLHF.</label>
+          <label><input type="checkbox"> I can explain model-based planning V1 and V2 and why replanning helps.</label>
+          <label><input type="checkbox"> I can explain hindsight relabeling and when it is valid.</label>
+        </div>
+
+        <h3>Rapid Questions</h3>
+        <details class="question">
+          <summary>1. A baseline is trained badly but depends only on <code>s_t</code>. Biased?</summary>
+          <div class="answer"><span class="answer-label">Answer.</span> No. It may not reduce variance, but it is action-independent.</div>
+        </details>
+        <details class="question">
+          <summary>2. You square all positive one-step rewards. Does the optimal policy always stay the same?</summary>
+          <div class="answer"><span class="answer-label">Answer.</span> No. Sums of transformed rewards can reorder trajectories.</div>
+        </details>
+        <details class="question">
+          <summary>3. Why does a target network help DQN?</summary>
+          <div class="answer"><span class="answer-label">Answer.</span> It makes bootstrapped regression labels change slowly instead of changing every time the online network updates.</div>
+        </details>
+        <details class="question">
+          <summary>4. What is the offline RL danger of <code>max_a Q(s,a)</code>?</summary>
+          <div class="answer"><span class="answer-label">Answer.</span> The max can select out-of-dataset actions whose Q-values are overestimated because the dataset gives no corrective evidence.</div>
+        </details>
+        <details class="question">
+          <summary>5. Why add a terminal value to model-based planning?</summary>
+          <div class="answer"><span class="answer-label">Answer.</span> It lets short-horizon planning account for rewards beyond the rollout horizon, reducing myopia in long-horizon tasks.</div>
+        </details>
+
+        <p class="source">
+          Built from local files: <code>practice_questions_224r.pdf</code>, <code>practice_solutions_224r.pdf</code>,
+          and lecture PDFs <code>01</code> through <code>12</code> in <code>cs224r lectures/</code>.
+        </p>
+      </section>
+    </main>
+  </div>
+  <script>
+    (() => {
+      const greek = {
+        alpha: "α",
+        beta: "β",
+        gamma: "γ",
+        delta: "δ",
+        epsilon: "ε",
+        eps: "ε",
+        lambda: "λ",
+        theta: "θ",
+        phi: "φ",
+        psi: "ψ",
+        pi: "π",
+        tau: "τ",
+        rho: "ρ",
+        sigma: "σ"
+      };
+
+      const escapeHtml = (value) => value
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+
+      const normalizeMathText = (value) => value
+        .replace(/\.\.\./g, "…")
+        .replace(/->/g, "→")
+        .replace(/<-/g, "←")
+        .replace(/>=/g, "≥")
+        .replace(/<=/g, "≤")
+        .replace(/\bapprox\b/g, "≈")
+        .replace(/\bproportional to\b/g, "∝")
+        .replace(/\bin\b/g, "∈")
+        .replace(/\bargmax\b/g, "arg max")
+        .replace(/\|/g, "∣")
+        .replace(/~/g, "∼")
+        .replace(/'/g, "′");
+
+      const greekify = (value) => value.replace(/\b(alpha|beta|gamma|delta|epsilon|eps|lambda|theta|phi|psi|pi|tau|rho|sigma)\b/g, (_, word) => greek[word]);
+
+      function toPlainMath(raw) {
+        let value = normalizeMathText(String(raw));
+        value = escapeHtml(value);
+        value = value
+          .replace(/\bD_expert\b/g, "D_{expert}")
+          .replace(/\bD_env\b/g, "D_{env}")
+          .replace(/\bD_model\b/g, "D_{model}")
+          .replace(/\bL_FM\b/g, "L_{FM}")
+          .replace(/\bell_lambda\^2\b/g, "ℓ_λ^2")
+          .replace(/\bQ_hat_phi\b/g, "Q̂_φ")
+          .replace(/\bV_hat_phi\b/g, "V̂_φ")
+          .replace(/\b([AQV])_hat_GAE\b/g, "$1̂_{GAE}")
+          .replace(/\b([AQV])_hat_([A-Za-z0-9]+)\b/g, "$1̂_{$2}")
+          .replace(/\b([AQV])_hat\b/g, "$1̂")
+          .replace(/\bpi_hat\b/g, "π̂")
+          .replace(/\b(pi|p|r|v)_theta\b/g, (_, base) => `${greek[base] || base}_θ`)
+          .replace(/\b([VQA])\^pi\b/g, "$1^π")
+          .replace(/\b([VQA])\*\b/g, "$1^*")
+          .replace(/\bE_\{/g, "𝔼_{")
+          .replace(/\bP_\{/g, "P_{")
+          .replace(/\bsum_\{/g, "∑_{")
+          .replace(/\bprod_\{/g, "∏_{")
+          .replace(/\bgrad_\{/g, "∇_{")
+          .replace(/\bE_([A-Za-z0-9.,′|()]+)/g, "𝔼_$1")
+          .replace(/\bP_([A-Za-z0-9.,′|()]+)/g, "P_$1")
+          .replace(/\bsum_([A-Za-z0-9′]+)/g, "∑_$1")
+          .replace(/\bprod_([A-Za-z0-9′]+)/g, "∏_$1")
+          .replace(/\bgrad_([A-Za-z0-9′]+)/g, "∇_$1")
+          .replace(/\bgrad\b/g, "∇")
+          .replace(/\bmin_/g, "min_")
+          .replace(/\bmax_/g, "max_")
+          .replace(/\bsigmoid\b/g, "σ")
+          .replace(/\bfor all\b/g, "∀");
+        return greekify(value);
+      }
+
+      function formatSub(raw) {
+        return addSubscriptsAndSuperscripts(toPlainMath(raw));
+      }
+
+      function addSubscriptsAndSuperscripts(value) {
+        const base = "(?:Q̂|V̂|Â|π̂|[A-Za-zα-ωΑ-Ω𝔼∑∏∇ℓπρσγλθφψ])";
+        let out = value;
+        out = out.replace(new RegExp(`(${base})_\\{([^}]+)\\}`, "g"), (_, b, sub) => `${b}<sub>${formatSub(sub)}</sub>`);
+        out = out.replace(new RegExp(`(${base})_([A-Za-z0-9α-ωΑ-Ω′*]+)`, "g"), (_, b, sub) => `${b}<sub>${formatSub(sub)}</sub>`);
+        out = out.replace(new RegExp(`(${base})\\^\\{([^}]+)\\}`, "g"), (_, b, sup) => `${b}<sup>${formatSub(sup)}</sup>`);
+        out = out.replace(new RegExp(`(${base})\\^([A-Za-z0-9α-ωΑ-Ω′*]+)`, "g"), (_, b, sup) => `${b}<sup>${formatSub(sup)}</sup>`);
+        return out;
+      }
+
+      function formatInline(raw) {
+        let value = addSubscriptsAndSuperscripts(toPlainMath(raw));
+        value = value
+          .replace(/\bclip\b/g, "<span class=\"op\">clip</span>")
+          .replace(/\barg max\b/g, "<span class=\"op\">arg max</span>")
+          .replace(/\bmin\b/g, "<span class=\"op\">min</span>")
+          .replace(/\bmax\b/g, "<span class=\"op\">max</span>")
+          .replace(/\bwhere\b/g, "<span class=\"text-note\">where</span>");
+        return value;
+      }
+
+      function lineToHtml(line) {
+        const raw = line.replace(/\s+$/g, "");
+        if (!raw.trim()) return "<span class=\"math-line\">&nbsp;</span>";
+        const leading = raw.match(/^\s*/)[0].length;
+        const trimmed = raw.trim();
+        if (/^[A-Za-z0-9 /+,-]+:$/.test(trimmed)) {
+          return `<span class="formula-label">${escapeHtml(trimmed.slice(0, -1))}</span>`;
+        }
+        const isSentence = /[a-z]{3,}\s+[a-z]{3,}/.test(trimmed) && !/[=∼~+\-*/^_]/.test(trimmed);
+        const cls = `math-line${leading ? " indent" : ""}${isSentence ? " text-note" : ""}`;
+        return `<span class="${cls}">${formatInline(trimmed)}</span>`;
+      }
+
+      document.querySelectorAll(".formula").forEach((block) => {
+        const original = block.textContent.replace(/\n+$/g, "");
+        block.classList.add("rendered-formula");
+        block.innerHTML = original.split("\n").map(lineToHtml).join("");
+      });
+    })();
+  </script>
+</body>
+</html>
