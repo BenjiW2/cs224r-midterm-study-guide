@@ -3142,6 +3142,10 @@ gamma Phi(s_2) - Phi(s_1)</div>
               <span><span class="math-inline">λ</span> is not the GAE lambda from the actor-critic section. In IQL, <span class="math-inline">λ</span> controls where <span class="math-inline">V(s)</span> lands among the dataset actions for this same state. If the dataset actions have Q-values <span class="math-inline">2, 5, 6</span>, an average-style <span class="math-inline">V(s)</span> would be near <span class="math-inline">4.3</span>. A high-action-style <span class="math-inline">V(s)</span> would be closer to <span class="math-inline">6</span>, because it is tracking the better dataset actions.</span>
             </div>
             <div>
+              <strong>High value means low λ with this formula</strong>
+              <span>Because this page defines <span class="math-inline">x = V(s)-Q(s,a)</span>, the loss weight when <span class="math-inline">V(s)</span> is too low is <span class="math-inline">1-λ</span>. So smaller <span class="math-inline">λ</span> makes being too low more expensive and pushes <span class="math-inline">V(s)</span> upward toward high dataset Q-values. Some papers use the opposite residual sign, where the convention looks reversed.</span>
+            </div>
+            <div>
               <strong>Line 2: train V(s)</strong>
               <span>Input: dataset states and dataset actions. Goal: make <span class="math-inline">V(s)</span> close to a high-but-supported dataset action value, using the current <span class="math-inline">Q(s,a)</span> estimates as references.</span>
             </div>
