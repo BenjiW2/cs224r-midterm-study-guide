@@ -1912,11 +1912,11 @@ gamma Phi(s_2) - Phi(s_1)</div>
           high reward, increase the probability of actions in that trajectory. If it gets low reward, decrease them.
         </p>
 
-        <div class="formula">Vanilla REINFORCE:
-grad_theta J(theta) =
-E_{tau ~ p_theta(tau)}[
-  (sum_t grad_theta log pi_theta(a_t | s_t)) (sum_t r_t)
-]</div>
+        <div class="plain-equation">
+          <span class="eq-caption">Vanilla REINFORCE</span>
+          <span class="eq-main">∇<sub>θ</sub>J(θ) = E<sub>τ ~ p<sub>θ</sub>(τ)</sub>[ (Σ<sub>t</sub> ∇<sub>θ</sub> log π<sub>θ</sub>(a<sub>t</sub> | s<sub>t</sub>)) (Σ<sub>t</sub> r<sub>t</sub>) ]</span>
+          <span class="eq-caption">Average over sampled trajectories: action log-probability gradients times total return.</span>
+        </div>
         <div class="worked">
           <h4>Read REINFORCE As A Training Rule</h4>
           <div class="component-list">
@@ -1935,7 +1935,9 @@ E_{tau ~ p_theta(tau)}[
         <p>
           The trajectory probability includes environment terms:
         </p>
-        <div class="formula">p_theta(tau) = p(s_1) prod_t pi_theta(a_t | s_t) p(s_{t+1} | s_t, a_t)</div>
+        <div class="plain-equation">
+          <span class="eq-main">p<sub>θ</sub>(τ) = p(s<sub>1</sub>) Π<sub>t</sub> π<sub>θ</sub>(a<sub>t</sub> | s<sub>t</sub>) p(s<sub>t+1</sub> | s<sub>t</sub>, a<sub>t</sub>)</span>
+        </div>
         <p>
           But <code>p(s_1)</code> and <code>p(s_{t+1} | s_t, a_t)</code> do not depend on <code>theta</code>.
           Therefore, their gradients are zero. The policy-gradient estimator only needs
@@ -1952,12 +1954,11 @@ E_{tau ~ p_theta(tau)}[
           Action <code>a_t</code> cannot affect rewards before time <code>t</code>. So we replace total return with
           future return:
         </p>
-        <div class="formula">With causality:
-grad_theta J(theta) =
-E[
-  sum_t grad_theta log pi_theta(a_t | s_t)
-  (sum_{t' = t}^T r_{t'} - b)
-]</div>
+        <div class="plain-equation">
+          <span class="eq-caption">With causality and baseline</span>
+          <span class="eq-main">∇<sub>θ</sub>J(θ) = E[ Σ<sub>t</sub> ∇<sub>θ</sub> log π<sub>θ</sub>(a<sub>t</sub> | s<sub>t</sub>) (Σ<sub>t'=t</sub><sup>T</sup> r<sub>t'</sub> - b) ]</span>
+          <span class="eq-caption">Each action is multiplied by future rewards only, minus a baseline.</span>
+        </div>
         <p>This keeps the expected gradient correct and usually reduces variance.</p>
         <div class="worked">
           <h4>Why Reward-To-Go Makes Sense</h4>
@@ -1979,11 +1980,11 @@ E[
           variance.
         </div>
 
-        <div class="formula">Why state-only baseline is unbiased:
-E_{a ~ pi(.|s)}[grad log pi(a|s) b(s)]
-= b(s) sum_a grad pi(a|s)
-= b(s) grad 1
-= 0</div>
+        <div class="plain-equation">
+          <span class="eq-caption">Why a state-only baseline is unbiased</span>
+          <span class="eq-main">E<sub>a ~ π(.|s)</sub>[∇ log π(a|s) b(s)] = b(s) Σ<sub>a</sub> ∇π(a|s) = b(s) ∇1 = 0</span>
+          <span class="eq-caption">Because probabilities over all actions sum to 1, their gradient sums to 0.</span>
+        </div>
         <div class="worked">
           <h4>Baseline Rule You Should Memorize</h4>
           <p>
@@ -2040,8 +2041,11 @@ E_{a ~ pi(.|s)}[grad log pi(a|s) b(s)]
           Vanilla policy gradient is on-policy: rollouts must come from the current policy. If data comes from
           an older policy, importance sampling can correct it:
         </p>
-        <div class="formula">Importance ratio:
-rho_t(theta') = pi_{theta'}(a_t | s_t) / pi_theta(a_t | s_t)</div>
+        <div class="plain-equation">
+          <span class="eq-caption">Importance ratio</span>
+          <span class="eq-main">ρ<sub>t</sub>(θ') = π<sub>θ'</sub>(a<sub>t</sub> | s<sub>t</sub>) / π<sub>θ</sub>(a<sub>t</sub> | s<sub>t</sub>)</span>
+          <span class="eq-caption">How much more or less likely the new policy makes the sampled action than the old policy.</span>
+        </div>
         <p>
           But large ratios cause high variance and unstable updates. That motivates KL constraints and PPO.
         </p>
@@ -2051,9 +2055,11 @@ rho_t(theta') = pi_{theta'}(a_t | s_t) / pi_theta(a_t | s_t)</div>
         <h2>Actor-Critic And PPO</h2>
 
         <h3>Value, Q, And Advantage</h3>
-        <div class="formula">V^pi(s) = expected future reward from state s, then follow pi
-Q^pi(s,a) = expected future reward from state s, take action a, then follow pi
-A^pi(s,a) = Q^pi(s,a) - V^pi(s)</div>
+        <div class="plain-equation">
+          <span class="eq-main">V<sup>π</sup>(s) = expected future reward from state s, then follow π</span>
+          <span class="eq-main">Q<sup>π</sup>(s,a) = expected future reward from state s, take action a, then follow π</span>
+          <span class="eq-main">A<sup>π</sup>(s,a) = Q<sup>π</sup>(s,a) - V<sup>π</sup>(s)</span>
+        </div>
         <div class="worked">
           <h4>Value, Q, Advantage With Numbers</h4>
           <p>
@@ -2069,9 +2075,11 @@ A^pi(s,a) = Q^pi(s,a) - V^pi(s)</div>
           The critic answers, "Was that action better or worse than expected?"
         </p>
 
-        <div class="formula">Actor-critic policy gradient:
-grad_theta J(theta) approx (1/N) sum_i sum_t
-  grad_theta log pi_theta(a_{i,t} | s_{i,t}) * A_hat(s_{i,t}, a_{i,t})</div>
+        <div class="plain-equation">
+          <span class="eq-caption">Actor-critic policy gradient</span>
+          <span class="eq-main">∇<sub>θ</sub>J(θ) ≈ (1/N) Σ<sub>i</sub>Σ<sub>t</sub> ∇<sub>θ</sub> log π<sub>θ</sub>(a<sub>i,t</sub> | s<sub>i,t</sub>) Â(s<sub>i,t</sub>, a<sub>i,t</sub>)</span>
+          <span class="eq-caption">REINFORCE, but using advantage instead of raw return.</span>
+        </div>
         <div class="note">
           Actor-critic is REINFORCE with a smarter score. Instead of multiplying by raw total return, multiply by
           estimated advantage: "was this sampled action better or worse than normal in this state?"
@@ -2094,7 +2102,7 @@ grad_theta J(theta) approx (1/N) sum_i sum_t
             </tr>
             <tr>
               <td>1-step TD</td>
-              <td><code>r_t + gamma V_hat(s_{t+1})</code></td>
+              <td><span class="math-inline">r<sub>t</sub> + γ V̂(s<sub>t+1</sub>)</span></td>
               <td>More bias from bootstrap, lower variance</td>
             </tr>
             <tr>
@@ -2105,8 +2113,10 @@ grad_theta J(theta) approx (1/N) sum_i sum_t
           </tbody>
         </table>
 
-        <div class="formula">1-step advantage estimate:
-A_hat(s_t,a_t) approx r_t + gamma V_hat(s_{t+1}) - V_hat(s_t)</div>
+        <div class="plain-equation">
+          <span class="eq-caption">1-step advantage estimate</span>
+          <span class="eq-main">Â(s<sub>t</sub>,a<sub>t</sub>) ≈ r<sub>t</sub> + γ V̂(s<sub>t+1</sub>) - V̂(s<sub>t</sub>)</span>
+        </div>
         <div class="worked">
           <h4>TD Advantage Example</h4>
           <p>
@@ -2123,27 +2133,23 @@ A_hat(s_t,a_t) approx r_t + gamma V_hat(s_{t+1}) - V_hat(s_t)</div>
           Short horizons have lower variance but more bootstrap bias. Long horizons have lower bootstrap bias
           but more rollout variance. GAE blends them with weights controlled by <code>lambda</code>.
         </p>
-        <div class="formula">n-step advantage:
-A_hat_n(s_t,a_t) =
-  sum_{t'=t}^{t+n} gamma^{t'-t} r_{t'}
-  - V_hat(s_t) + gamma^n V_hat(s_{t+n})
-
-GAE:
-A_hat_GAE = sum_n w_n A_hat_n, where w_n proportional to lambda^{n-1}</div>
+        <div class="plain-equation">
+          <span class="eq-caption">n-step advantage</span>
+          <span class="eq-main">Â<sub>n</sub>(s<sub>t</sub>,a<sub>t</sub>) = Σ<sub>t'=t</sub><sup>t+n</sup> γ<sup>t'-t</sup>r<sub>t'</sub> - V̂(s<sub>t</sub>) + γ<sup>n</sup>V̂(s<sub>t+n</sub>)</span>
+          <span class="eq-caption">GAE blends these n-step estimates with weights proportional to λ<sup>n-1</sup>.</span>
+        </div>
 
         <h3>PPO</h3>
         <p>
           PPO lets you take multiple gradient steps on a batch while preventing the new policy from moving too far.
           It does this by clipping the importance ratio.
         </p>
-        <div class="formula">ratio:
-r_t(theta') = pi_{theta'}(a_t | s_t) / pi_theta(a_t | s_t)
-
-PPO clipped surrogate:
-sum_{i,t} min(
-  r_t(theta') A_hat_t,
-  clip(r_t(theta'), 1 - eps, 1 + eps) A_hat_t
-)</div>
+        <div class="plain-equation">
+          <span class="eq-caption">PPO ratio</span>
+          <span class="eq-main">r<sub>t</sub>(θ') = π<sub>θ'</sub>(a<sub>t</sub> | s<sub>t</sub>) / π<sub>θ</sub>(a<sub>t</sub> | s<sub>t</sub>)</span>
+          <span class="eq-caption">PPO clipped surrogate</span>
+          <span class="eq-main">Σ<sub>i,t</sub> min( r<sub>t</sub>(θ')Â<sub>t</sub>, clip(r<sub>t</sub>(θ'), 1-ε, 1+ε)Â<sub>t</sub> )</span>
+        </div>
         <p>
           If an update would make the policy probability change too much in a way that improves the surrogate,
           clipping removes the extra incentive.
@@ -2221,11 +2227,12 @@ sum_{i,t} min(
           Actor-critic estimates <code>Q^pi</code> for the current policy. Q-learning tries to estimate
           <code>Q*</code>, the Q-value of the optimal policy, directly.
         </p>
-        <div class="formula">Bellman equation for a fixed policy:
-Q^pi(s,a) = r(s,a) + gamma E_{s', a' ~ pi(.|s')}[Q^pi(s',a')]
-
-Bellman optimality equation:
-Q*(s,a) = r(s,a) + gamma E_{s'}[max_{a'} Q*(s',a')]</div>
+        <div class="plain-equation">
+          <span class="eq-caption">Bellman equation for a fixed policy</span>
+          <span class="eq-main">Q<sup>π</sup>(s,a) = r(s,a) + γ E<sub>s', a' ~ π(.|s')</sub>[Q<sup>π</sup>(s',a')]</span>
+          <span class="eq-caption">Bellman optimality equation</span>
+          <span class="eq-main">Q*(s,a) = r(s,a) + γ E<sub>s'</sub>[ max<sub>a'</sub> Q*(s',a') ]</span>
+        </div>
         <div class="worked">
           <h4>Fixed Policy Versus Optimal Control</h4>
           <p>
@@ -2237,11 +2244,12 @@ Q*(s,a) = r(s,a) + gamma E_{s'}[max_{a'} Q*(s',a')]</div>
         </div>
 
         <h3>Q-Learning Target And Loss</h3>
-        <div class="formula">1-step Q-learning target:
-y_i = r_i + gamma max_{a'} Q_hat_phi(s'_i, a')
-
-Q-learning loss:
-L(phi) = (1/N) sum_i || Q_hat_phi(s_i,a_i) - y_i ||^2</div>
+        <div class="plain-equation">
+          <span class="eq-caption">1-step Q-learning target</span>
+          <span class="eq-main">y<sub>i</sub> = r<sub>i</sub> + γ max<sub>a'</sub> Q̂<sub>φ</sub>(s'<sub>i</sub>, a')</span>
+          <span class="eq-caption">Q-learning loss</span>
+          <span class="eq-main">L(φ) = (1/N) Σ<sub>i</sub> || Q̂<sub>φ</sub>(s<sub>i</sub>,a<sub>i</sub>) - y<sub>i</sub> ||<sup>2</sup></span>
+        </div>
         <div class="worked">
           <h4>What Is The Target?</h4>
           <p>
@@ -2297,10 +2305,10 @@ L(phi) = (1/N) sum_i || Q_hat_phi(s_i,a_i) - y_i ||^2</div>
         </p>
 
         <h3>n-Step Q-Learning</h3>
-        <div class="formula">n-step Q target:
-y_{i,t}^{(n)} =
-  sum_{t'=t}^{t+n-1} gamma^{t'-t} r_{i,t'}
-  + gamma^n max_a Q_hat(s_{i,t+n}, a)</div>
+        <div class="plain-equation">
+          <span class="eq-caption">n-step Q target</span>
+          <span class="eq-main">y<sub>i,t</sub><sup>(n)</sup> = Σ<sub>t'=t</sub><sup>t+n-1</sup> γ<sup>t'-t</sup> r<sub>i,t'</sub> + γ<sup>n</sup> max<sub>a</sub> Q̂(s<sub>i,t+n</sub>, a)</span>
+        </div>
         <div class="worked">
           <h4>n-Step Target In Words</h4>
           <p>
@@ -2365,10 +2373,11 @@ y_{i,t}^{(n)} =
           AWR turns imitation learning into weighted imitation: copy dataset actions more strongly when their
           estimated advantage is high.
         </p>
-        <div class="formula">AWR objective:
-max_theta E_{(s,a) ~ D}[
-  log pi_theta(a | s) exp((1/alpha) A_hat(s,a))
-]</div>
+        <div class="plain-equation">
+          <span class="eq-caption">AWR objective</span>
+          <span class="eq-main">max<sub>θ</sub> E<sub>(s,a)~D</sub>[ log π<sub>θ</sub>(a|s) exp(Â(s,a)/α) ]</span>
+          <span class="eq-caption">Weighted behavior cloning: high-advantage dataset actions get copied more strongly.</span>
+        </div>
         <div class="worked">
           <h4>Read AWR As Weighted Behavior Cloning</h4>
           <p>
@@ -2398,21 +2407,16 @@ max_theta E_{(s,a) ~ D}[
           It learns <code>V</code> with an asymmetric expectile loss, learns <code>Q</code> by bootstrapping to
           <code>V</code>, then extracts a policy with AWR-style weighted behavior cloning.
         </p>
-        <div class="formula">Expectile loss for residual x = V(s) - Q(s,a):
-ell_lambda^2(x) =
-  (1 - lambda) x^2   if x &lt; 0
-  lambda x^2         if x &gt;= 0
-
-IQL value fit:
-V_hat(s) &lt;- argmin_V E_{(s,a)~D}[ell_lambda^2(V(s) - Q_hat(s,a))]
-
-IQL Q update:
-Q_hat(s,a) &lt;- argmin_Q E[(Q(s,a) - (r + gamma V_hat(s')))^2]
-
-Policy extraction:
-pi_hat &lt;- argmax_pi E_{(s,a)~D}[
-  log pi(a|s) exp((1/alpha)(Q_hat(s,a) - V_hat(s)))
-]</div>
+        <div class="plain-equation">
+          <span class="eq-caption">Expectile loss for residual x = V(s) - Q(s,a)</span>
+          <span class="eq-main">ℓ<sub>λ</sub><sup>2</sup>(x) = (1-λ)x<sup>2</sup> if x &lt; 0, and λx<sup>2</sup> if x ≥ 0</span>
+          <span class="eq-caption">IQL value fit</span>
+          <span class="eq-main">V̂(s) ← argmin<sub>V</sub> E<sub>(s,a)~D</sub>[ℓ<sub>λ</sub><sup>2</sup>(V(s)-Q̂(s,a))]</span>
+          <span class="eq-caption">IQL Q update</span>
+          <span class="eq-main">Q̂(s,a) ← argmin<sub>Q</sub> E[(Q(s,a) - (r + γV̂(s')))<sup>2</sup>]</span>
+          <span class="eq-caption">Policy extraction</span>
+          <span class="eq-main">π̂ ← argmax<sub>π</sub> E<sub>(s,a)~D</sub>[log π(a|s) exp((Q̂(s,a)-V̂(s))/α)]</span>
+        </div>
         <div class="worked">
           <h4>IQL In Three Moves</h4>
           <ol>
@@ -2464,17 +2468,14 @@ pi_hat &lt;- argmax_pi E_{(s,a)~D}[
           Humans often find pairwise comparisons easier than calibrated scalar ratings. Instead of asking
           "what reward score is this trajectory?", ask "which trajectory is better?"
         </p>
-        <div class="formula">Trajectory reward:
-r_theta(tau) = sum_{(s,a) in tau} r_theta(s,a)
-
-Bradley-Terry preference model:
-P_theta(tau_w preferred to tau_l)
-  = sigmoid(r_theta(tau_w) - r_theta(tau_l))
-
-Reward model objective:
-max_theta E_{(tau_w,tau_l)}[
-  log sigmoid(r_theta(tau_w) - r_theta(tau_l))
-]</div>
+        <div class="plain-equation">
+          <span class="eq-caption">Trajectory reward</span>
+          <span class="eq-main">r<sub>θ</sub>(τ) = Σ<sub>(s,a)∈τ</sub> r<sub>θ</sub>(s,a)</span>
+          <span class="eq-caption">Bradley-Terry preference model</span>
+          <span class="eq-main">P<sub>θ</sub>(τ<sub>w</sub> preferred to τ<sub>l</sub>) = sigmoid(r<sub>θ</sub>(τ<sub>w</sub>) - r<sub>θ</sub>(τ<sub>l</sub>))</span>
+          <span class="eq-caption">Reward model objective</span>
+          <span class="eq-main">max<sub>θ</sub> E<sub>(τ<sub>w</sub>,τ<sub>l</sub>)</sub>[log sigmoid(r<sub>θ</sub>(τ<sub>w</sub>) - r<sub>θ</sub>(τ<sub>l</sub>))]</span>
+        </div>
         <div class="worked">
           <h4>Preference Model With Numbers</h4>
           <p>
@@ -2566,11 +2567,12 @@ max_theta E_{(tau_w,tau_l)}[
           <code>r_theta(s_t,a_t)</code>.
         </p>
 
-        <div class="formula">Dynamics model:
-p_theta(s_{t+1} | s_t, a_t)
-
-Reward model:
-r_theta(s_t, a_t)</div>
+        <div class="plain-equation">
+          <span class="eq-caption">Dynamics model</span>
+          <span class="eq-main">p<sub>θ</sub>(s<sub>t+1</sub> | s<sub>t</sub>, a<sub>t</sub>)</span>
+          <span class="eq-caption">Reward model</span>
+          <span class="eq-main">r<sub>θ</sub>(s<sub>t</sub>, a<sub>t</sub>)</span>
+        </div>
         <div class="worked">
           <h4>What The Model Is For</h4>
           <p>
@@ -2596,18 +2598,14 @@ r_theta(s_t, a_t)</div>
           The planner itself can be the policy. At state <code>s_t</code>, sample candidate action sequences, roll them
           out in the learned model, score them, execute the first action of the best sequence, then replan next step.
         </p>
-        <div class="formula">Model rollout setup:
-sample N action sequences a^i_{t:t+H}
-roll them out with p_theta to get s_hat^i_{t+1:t+H+1}
-
-Planning V1:
-i* = argmax_i sum_{t'=t}^{t+H} r(s_hat^i_{t'}, a^i_{t'})
-
-Planning V2:
-i* = argmax_i [
-  sum_{t'=t}^{t+H} r(s_hat^i_{t'}, a^i_{t'})
-  + V_hat(s_hat^i_{t+H+1})
-]</div>
+        <div class="plain-equation">
+          <span class="eq-caption">Model rollout setup</span>
+          <span class="eq-main">sample N action sequences a<sup>i</sup><sub>t:t+H</sub>, then roll them out with p<sub>θ</sub> to get ŝ<sup>i</sup><sub>t+1:t+H+1</sub></span>
+          <span class="eq-caption">Planning V1</span>
+          <span class="eq-main">i* = argmax<sub>i</sub> Σ<sub>t'=t</sub><sup>t+H</sup> r(ŝ<sup>i</sup><sub>t'</sub>, a<sup>i</sup><sub>t'</sub>)</span>
+          <span class="eq-caption">Planning V2</span>
+          <span class="eq-main">i* = argmax<sub>i</sub>[Σ<sub>t'=t</sub><sup>t+H</sup> r(ŝ<sup>i</sup><sub>t'</sub>, a<sup>i</sup><sub>t'</sub>) + V̂(ŝ<sup>i</sup><sub>t+H+1</sub>)]</span>
+        </div>
         <div class="worked">
           <h4>Planning V1 Versus V2</h4>
           <p>
@@ -2653,10 +2651,11 @@ i* = argmax_i [
           Instead of one MDP, we have a task distribution. Tasks may differ in rewards, dynamics, initial states,
           action spaces, or goals. The key practical idea is to condition the policy on the task.
         </p>
-        <div class="formula">Task-conditioned policy:
-pi_theta(a | s, z)
-
-where z can be a task ID, goal state, instruction, desired object, user ID, etc.</div>
+        <div class="plain-equation">
+          <span class="eq-caption">Task-conditioned policy</span>
+          <span class="eq-main">π<sub>θ</sub>(a | s, z)</span>
+          <span class="eq-caption">z can be a task ID, goal state, instruction, desired object, user ID, etc.</span>
+        </div>
         <div class="worked">
           <h4>What Conditioning Changes</h4>
           <p>
@@ -2717,72 +2716,79 @@ where z can be a task ID, goal state, instruction, desired object, user ID, etc.
         </p>
 
         <h3>Imitation Learning</h3>
-        <div class="formula">min_theta E_{(s,a) ~ D_expert}[-log pi_theta(a|s)]</div>
+        <div class="plain-equation">
+          <span class="eq-main">min<sub>θ</sub> E<sub>(s,a)~D<sub>expert</sub></sub>[ -log π<sub>θ</sub>(a|s) ]</span>
+        </div>
         <p>Use when you have expert state-action pairs and want to clone the expert.</p>
 
-        <div class="formula">Flow matching:
-d a_{t,tau}/d tau = v_theta(s_t, a_{t,tau}, tau)
-a_{t,tau+1/n} = a_{t,tau} + (1/n) v_theta(...)
-L_FM = average squared error to (a_t - a_{t,0})</div>
+        <div class="plain-equation">
+          <span class="eq-caption">Flow matching</span>
+          <span class="eq-main">d a<sub>t,τ</sub> / dτ = v<sub>θ</sub>(s<sub>t</sub>, a<sub>t,τ</sub>, τ)</span>
+          <span class="eq-main">a<sub>t,τ+1/n</sub> = a<sub>t,τ</sub> + (1/n)v<sub>θ</sub>(...)</span>
+          <span class="eq-caption">Train v<sub>θ</sub> to point from noisy action toward expert action.</span>
+        </div>
         <p>Use when discussing expressive action distributions and generative policy models.</p>
 
         <h3>Policy Gradients</h3>
-        <div class="formula">J(theta) = E_{tau ~ p_theta(tau)}[sum_t r(s_t,a_t)]
-p_theta(tau) = p(s_1) prod_t pi_theta(a_t|s_t) p(s_{t+1}|s_t,a_t)
-grad p = p grad log p
-
-REINFORCE:
-E[(sum_t grad log pi_theta(a_t|s_t)) (sum_t r_t)]
-
-Causality + baseline:
-E[sum_t grad log pi_theta(a_t|s_t) (sum_{t'=t}^T r_{t'} - b)]</div>
+        <div class="plain-equation">
+          <span class="eq-main">J(θ) = E<sub>τ~p<sub>θ</sub>(τ)</sub>[Σ<sub>t</sub> r(s<sub>t</sub>,a<sub>t</sub>)]</span>
+          <span class="eq-main">p<sub>θ</sub>(τ) = p(s<sub>1</sub>)Π<sub>t</sub>π<sub>θ</sub>(a<sub>t</sub>|s<sub>t</sub>)p(s<sub>t+1</sub>|s<sub>t</sub>,a<sub>t</sub>)</span>
+          <span class="eq-main">∇p = p∇log p</span>
+          <span class="eq-caption">REINFORCE</span>
+          <span class="eq-main">E[(Σ<sub>t</sub>∇logπ<sub>θ</sub>(a<sub>t</sub>|s<sub>t</sub>))(Σ<sub>t</sub>r<sub>t</sub>)]</span>
+          <span class="eq-caption">Causality + baseline</span>
+          <span class="eq-main">E[Σ<sub>t</sub>∇logπ<sub>θ</sub>(a<sub>t</sub>|s<sub>t</sub>)(Σ<sub>t'=t</sub><sup>T</sup>r<sub>t'</sub>-b)]</span>
+        </div>
         <p>Use to reason about credit assignment, baselines, and why dynamics terms vanish.</p>
 
         <h3>Actor-Critic</h3>
-        <div class="formula">A^pi(s,a) = Q^pi(s,a) - V^pi(s)
-grad J approx average sum_t grad log pi(a_t|s_t) A_hat(s_t,a_t)
-A_hat_1 approx r_t + gamma V_hat(s_{t+1}) - V_hat(s_t)</div>
+        <div class="plain-equation">
+          <span class="eq-main">A<sup>π</sup>(s,a) = Q<sup>π</sup>(s,a) - V<sup>π</sup>(s)</span>
+          <span class="eq-main">∇J ≈ average Σ<sub>t</sub> ∇logπ(a<sub>t</sub>|s<sub>t</sub>)Â(s<sub>t</sub>,a<sub>t</sub>)</span>
+          <span class="eq-main">Â<sub>1</sub> ≈ r<sub>t</sub> + γV̂(s<sub>t+1</sub>) - V̂(s<sub>t</sub>)</span>
+        </div>
         <p>Use when a learned value function replaces raw reward-to-go.</p>
 
         <h3>PPO And GAE</h3>
-        <div class="formula">GAE blends n-step advantage estimates with weights proportional to lambda^{n-1}.
-
-PPO uses:
-min(ratio * A_hat, clip(ratio, 1-eps, 1+eps) * A_hat)</div>
+        <div class="plain-equation">
+          <span class="eq-main">GAE blends n-step advantage estimates with weights proportional to λ<sup>n-1</sup>.</span>
+          <span class="eq-caption">PPO uses</span>
+          <span class="eq-main">min(ratio · Â, clip(ratio, 1-ε, 1+ε) · Â)</span>
+        </div>
         <p>Use when reusing data for multiple steps without allowing very large policy updates.</p>
 
         <h3>Q-Learning</h3>
-        <div class="formula">1-step target:
-y_i = r_i + gamma max_{a'} Q_hat(s'_i,a')
-
-n-step target:
-y_{i,t}^{(n)} =
-sum_{t'=t}^{t+n-1} gamma^{t'-t} r_{i,t'}
-+ gamma^n max_a Q_hat(s_{i,t+n},a)</div>
+        <div class="plain-equation">
+          <span class="eq-caption">1-step target</span>
+          <span class="eq-main">y<sub>i</sub> = r<sub>i</sub> + γ max<sub>a'</sub> Q̂(s'<sub>i</sub>,a')</span>
+          <span class="eq-caption">n-step target</span>
+          <span class="eq-main">y<sub>i,t</sub><sup>(n)</sup> = Σ<sub>t'=t</sub><sup>t+n-1</sup>γ<sup>t'-t</sup>r<sub>i,t'</sub> + γ<sup>n</sup>max<sub>a</sub>Q̂(s<sub>i,t+n</sub>,a)</span>
+        </div>
         <p>Use for value-based methods and DQN. Remember the off-policy issue for <code>n &gt; 1</code>.</p>
 
         <h3>Offline RL</h3>
-        <div class="formula">AWR:
-max_theta E_D[log pi_theta(a|s) exp((1/alpha) A_hat(s,a))]
-
-IQL expectile loss:
-x = V_hat(s) - Q_hat(s,a)
-ell_lambda^2(x) = (1-lambda)x^2 if x&lt;0, else lambda x^2</div>
+        <div class="plain-equation">
+          <span class="eq-caption">AWR</span>
+          <span class="eq-main">max<sub>θ</sub> E<sub>D</sub>[logπ<sub>θ</sub>(a|s) exp(Â(s,a)/α)]</span>
+          <span class="eq-caption">IQL expectile loss</span>
+          <span class="eq-main">x = V̂(s) - Q̂(s,a), &nbsp; ℓ<sub>λ</sub><sup>2</sup>(x) = (1-λ)x<sup>2</sup> if x&lt;0, else λx<sup>2</sup></span>
+        </div>
         <p>Use when the policy is trained only on dataset actions and values are learned without OOD maximization.</p>
 
         <h3>Reward Learning</h3>
-        <div class="formula">P(tau_w preferred to tau_l)
-= sigmoid(r_theta(tau_w) - r_theta(tau_l))
-
-max_theta E[log sigmoid(r_theta(tau_w) - r_theta(tau_l))]</div>
+        <div class="plain-equation">
+          <span class="eq-main">P(τ<sub>w</sub> preferred to τ<sub>l</sub>) = sigmoid(r<sub>θ</sub>(τ<sub>w</sub>) - r<sub>θ</sub>(τ<sub>l</sub>))</span>
+          <span class="eq-main">max<sub>θ</sub> E[log sigmoid(r<sub>θ</sub>(τ<sub>w</sub>) - r<sub>θ</sub>(τ<sub>l</sub>))]</span>
+        </div>
         <p>Use for pairwise preference learning and RLHF reward models.</p>
 
         <h3>Model-Based RL</h3>
-        <div class="formula">Planning V1:
-choose action sequence with largest predicted finite-horizon reward
-
-Planning V2:
-finite-horizon reward + terminal value V_hat(s_{t+H+1})</div>
+        <div class="plain-equation">
+          <span class="eq-caption">Planning V1</span>
+          <span class="eq-main">choose action sequence with largest predicted finite-horizon reward</span>
+          <span class="eq-caption">Planning V2</span>
+          <span class="eq-main">finite-horizon reward + terminal value V̂(s<sub>t+H+1</sub>)</span>
+        </div>
         <p>Use when the agent has learned or known dynamics and can evaluate candidate futures.</p>
       </section>
 
