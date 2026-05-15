@@ -3044,6 +3044,56 @@ gamma Phi(s_2) - Phi(s_1)</div>
           <code>V</code>, then extracts a policy with AWR-style weighted behavior cloning.
         </p>
         <div class="worked">
+          <h4>The Problem IQL Is Solving</h4>
+          <p>
+            In offline RL, the dangerous move is:
+            <span class="math-inline">max<sub>a</sub> Q(s,a)</span>. That asks the Q-function about actions that may
+            not appear in the dataset. If the Q-function is wrong there, the policy may chase fake high values.
+          </p>
+          <p>
+            IQL avoids that explicit max. Instead of asking "what is the best action over all possible actions?",
+            it asks a safer question: "among the actions actually seen in the dataset at this state, what does a
+            pretty good action look like?"
+          </p>
+        </div>
+        <div class="worked">
+          <h4>The Three Things IQL Learns</h4>
+          <div class="component-list">
+            <div>
+              <strong>Q(s,a)</strong>
+              <span>How good is this specific dataset action in this state?</span>
+            </div>
+            <div>
+              <strong>V(s)</strong>
+              <span>A high-but-still-dataset-supported value for the state. Think "value of a good action from the dataset," not "max over every possible action."</span>
+            </div>
+            <div>
+              <strong>π(a|s)</strong>
+              <span>The final policy, trained by weighted behavior cloning to copy dataset actions with high <span class="math-inline">Q(s,a)-V(s)</span>.</span>
+            </div>
+          </div>
+        </div>
+        <div class="worked">
+          <h4>Toy State Example</h4>
+          <p>
+            Suppose the dataset has three actions in the same state with estimated Q-values:
+          </p>
+          <div class="plain-equation">
+            <span class="eq-main">dataset action A: Q = 2</span>
+            <span class="eq-main">dataset action B: Q = 5</span>
+            <span class="eq-main">dataset action C: Q = 6</span>
+          </div>
+          <p>
+            A plain average value might be around <span class="math-inline">4.3</span>. A hard max would be
+            <span class="math-inline">6</span>. IQL's expectile value tries to land high, closer to the good dataset
+            actions, but without maximizing over actions outside the dataset.
+          </p>
+          <p>
+            Then the policy extraction step copies action C more than action A because
+            <span class="math-inline">Q(s,C)-V(s)</span> is better than <span class="math-inline">Q(s,A)-V(s)</span>.
+          </p>
+        </div>
+        <div class="worked">
           <h4>IQL Before The Equations</h4>
           <p>
             IQL is trying to be optimistic inside the dataset without ever asking
@@ -3066,6 +3116,19 @@ gamma Phi(s_2) - Phi(s_1)</div>
           <span class="eq-main">Q̂(s,a) ← argmin<sub>Q</sub> E[(Q(s,a) - (r + γV̂(s')))<sup>2</sup>]</span>
           <span class="eq-caption">Policy extraction</span>
           <span class="eq-main">π̂ ← argmax<sub>π</sub> E<sub>(s,a)~D</sub>[log π(a|s) exp((Q̂(s,a)-V̂(s))/α)]</span>
+        </div>
+        <div class="worked">
+          <h4>Read The Equations In This Order</h4>
+          <ol>
+            <li><strong>Fit V:</strong> make <span class="math-inline">V(s)</span> close to the upper part of the dataset action values <span class="math-inline">Q(s,a)</span>.</li>
+            <li><strong>Fit Q:</strong> train <span class="math-inline">Q(s,a)</span> with target <span class="math-inline">r + γV(s')</span>. This backs up through <span class="math-inline">V</span>, not through <span class="math-inline">max<sub>a</sub>Q(s',a)</span>.</li>
+            <li><strong>Fit policy:</strong> do weighted behavior cloning. Copy dataset actions more when <span class="math-inline">Q(s,a)-V(s)</span> is positive/high.</li>
+          </ol>
+          <p>
+            The name "implicit Q-learning" comes from this: it behaves like it is improving toward better actions,
+            but the improvement is implicit through <span class="math-inline">V</span> and weighted imitation rather
+            than explicit action maximization.
+          </p>
         </div>
         <div class="worked">
           <h4>IQL In Three Moves</h4>
