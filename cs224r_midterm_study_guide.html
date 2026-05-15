@@ -2409,7 +2409,7 @@ gamma Phi(s_2) - Phi(s_1)</div>
           <summary>Check: if advantage is positive, what does PPO clipping prevent?</summary>
           <div class="answer">
             <span class="answer-label">Answer.</span>
-            It prevents increasing the probability of that action by more than about <code>1 + eps</code> within
+            It prevents increasing the probability of that action by more than about <span class="math-inline">1 + ε</span> within
             the surrogate objective. The policy can still change, but the objective stops rewarding excessive
             probability increases on that sample.
           </div>
@@ -2438,7 +2438,7 @@ gamma Phi(s_2) - Phi(s_1)</div>
             </tr>
             <tr>
               <td>Q critic</td>
-              <td>Estimate <code>Q^pi(s,a)</code> with TD-style bootstrapping</td>
+              <td>Estimate <span class="math-inline">Q<sup>π</sup>(s,a)</span> with TD-style bootstrapping</td>
               <td>Gives a reusable estimate of action quality</td>
             </tr>
             <tr>
@@ -2465,9 +2465,27 @@ gamma Phi(s_2) - Phi(s_1)</div>
 
         <h3>From Policy Evaluation To Optimal Control</h3>
         <p>
-          Actor-critic estimates <code>Q^pi</code> for the current policy. Q-learning tries to estimate
-          <code>Q*</code>, the Q-value of the optimal policy, directly.
+          Actor-critic estimates <span class="math-inline">Q<sup>π</sup></span> for the current policy. Q-learning tries to estimate
+          <span class="math-inline">Q*</span>, the Q-value of the optimal policy, directly.
         </p>
+        <div class="worked">
+          <h4>What Bellman Equations Are Doing</h4>
+          <p>
+            A Bellman equation is just a recursive definition of value:
+            <span class="math-inline">value now = immediate reward + discounted value later</span>.
+            The only difference between the two equations below is what happens after the next state.
+          </p>
+          <div class="component-list">
+            <div>
+              <strong>Fixed policy</strong>
+              <span>After the first action, keep following the given policy <span class="math-inline">π</span>.</span>
+            </div>
+            <div>
+              <strong>Optimal control</strong>
+              <span>After the first action, choose whichever next action has the largest learned Q-value.</span>
+            </div>
+          </div>
+        </div>
         <div class="plain-equation">
           <span class="eq-caption">Bellman equation for a fixed policy</span>
           <span class="eq-main">Q<sup>π</sup>(s,a) = r(s,a) + γ E<sub>s', a' ~ π(.|s')</sub>[Q<sup>π</sup>(s',a')]</span>
@@ -2482,6 +2500,24 @@ gamma Phi(s_2) - Phi(s_1)</div>
             how good is it if I act optimally from then on? That is why the optimality equation has
             <span class="math-inline">max<sub>a'</sub></span>.
           </p>
+        </div>
+        <div class="component-list">
+          <div>
+            <strong>s'</strong>
+            <span>The next state after taking action <span class="math-inline">a</span> in state <span class="math-inline">s</span>.</span>
+          </div>
+          <div>
+            <strong>a'</strong>
+            <span>The next action taken in that next state.</span>
+          </div>
+          <div>
+            <strong>E[...]</strong>
+            <span>Average over environment randomness, and for fixed-policy evaluation also over the policy's next action.</span>
+          </div>
+          <div>
+            <strong>max<sub>a'</sub></strong>
+            <span>Try all possible next actions in the formula and use the best predicted one.</span>
+          </div>
         </div>
 
         <h3>Q-Learning Target And Loss</h3>
@@ -2500,9 +2536,26 @@ gamma Phi(s_2) - Phi(s_1)</div>
             <span class="math-inline">10</span>, so <span class="math-inline">y = 2 + 0.9·10 = 11</span>.
           </p>
         </div>
+        <div class="worked">
+          <h4>Why There Is A Loss</h4>
+          <p>
+            The Q-network predicts <span class="math-inline">Q̂<sub>φ</sub>(s<sub>i</sub>,a<sub>i</sub>)</span>.
+            The target <span class="math-inline">y<sub>i</sub></span> is the label we want that prediction to match.
+            The loss is squared error between the prediction and the label.
+          </p>
+          <div class="plain-equation">
+            <span class="eq-main">prediction = Q̂<sub>φ</sub>(s<sub>i</sub>, a<sub>i</sub>)</span>
+            <span class="eq-main">label = y<sub>i</sub></span>
+            <span class="eq-main">loss = average squared prediction error</span>
+          </div>
+          <p>
+            <span class="math-inline">φ</span> is just the Q-network's weights, the same way
+            <span class="math-inline">θ</span> is often the policy network's weights.
+          </p>
+        </div>
         <p>
-          Once <code>Q_hat</code> is good, the policy is greedy:
-          choose <code>argmax_a Q_hat(s,a)</code>.
+          Once <span class="math-inline">Q̂</span> is good, the policy is greedy:
+          choose <span class="math-inline">argmax<sub>a</sub> Q̂(s,a)</span>.
         </p>
 
         <h3>Why DQN Needs Stabilizers</h3>
@@ -2544,6 +2597,14 @@ gamma Phi(s_2) - Phi(s_1)</div>
           Double DQN separates action selection from action evaluation: use one network to pick the best action
           and another to evaluate it.
         </p>
+        <div class="worked">
+          <h4>Why Max Causes Overestimation</h4>
+          <p>
+            If several action values are noisy, the largest one is often large partly because of noise. The
+            <span class="math-inline">max</span> operator keeps selecting those lucky overestimates. Double DQN
+            reduces this by using one network to choose the action and a separate target network to score it.
+          </p>
+        </div>
 
         <h3>n-Step Q-Learning</h3>
         <div class="plain-equation">
@@ -2568,8 +2629,8 @@ gamma Phi(s_2) - Phi(s_1)</div>
           <summary>Check: why is 1-step Q-learning naturally compatible with off-policy replay?</summary>
           <div class="answer">
             <span class="answer-label">Answer.</span>
-            After observing <code>(s_t, a_t, r_t, s_{t+1})</code>, the next action in the target is chosen by
-            <code>max_a Q(s_{t+1},a)</code>, not by the action actually taken next in the replay trajectory.
+            After observing <span class="math-inline">(s<sub>t</sub>, a<sub>t</sub>, r<sub>t</sub>, s<sub>t+1</sub>)</span>, the next action in the target is chosen by
+            <span class="math-inline">max<sub>a</sub> Q(s<sub>t+1</sub>,a)</span>, not by the action actually taken next in the replay trajectory.
             For <code>n &gt; 1</code>, intermediate rewards depend on behavior-policy actions in the buffer.
           </div>
         </details>
@@ -2580,10 +2641,24 @@ gamma Phi(s_2) - Phi(s_1)</div>
 
         <h3>The Problem</h3>
         <p>
-          Offline RL trains only on a fixed dataset <code>D</code> collected by a behavior policy
-          <code>pi_beta</code>. You cannot collect new rollouts. The goal is to learn a better policy
-          <code>pi_theta</code>.
+          Offline RL trains only on a fixed dataset <span class="math-inline">D</span> collected by a behavior policy
+          <span class="math-inline">π<sub>β</sub></span>. You cannot collect new rollouts. The goal is to learn a better policy
+          <span class="math-inline">π<sub>θ</sub></span>.
         </p>
+        <div class="worked">
+          <h4>The One Offline RL Problem</h4>
+          <p>
+            In online RL, if the policy tries a weird action, the environment tells us what happens. In offline RL,
+            the dataset may contain no examples of that weird action. The Q-function can hallucinate that the weird
+            action is great, and the policy has no way to check.
+          </p>
+          <div class="component-list">
+            <div><strong>D</strong><span>The fixed dataset. This is all the experience you get.</span></div>
+            <div><strong>π<sub>β</sub></strong><span>The behavior policy that collected the dataset.</span></div>
+            <div><strong>π<sub>θ</sub></strong><span>The new policy you are trying to learn.</span></div>
+            <div><strong>Dataset support</strong><span>The state-action pairs that actually appear enough in the dataset to trust.</span></div>
+          </div>
+        </div>
 
         <h3>Why Not Just Use Off-Policy Q-Learning?</h3>
         <p>
@@ -2639,7 +2714,7 @@ gamma Phi(s_2) - Phi(s_1)</div>
         <p>
           Good: policy is trained only on dataset actions, so it avoids querying OOD actions. Weakness:
           basic AWR uses Monte Carlo returns, which can be high variance, and its advantages are tied to
-          the behavior policy <code>pi_beta</code>.
+          the behavior policy <span class="math-inline">π<sub>β</sub></span>.
         </p>
 
         <h3>IQL: Implicit Q-Learning</h3>
@@ -2648,6 +2723,20 @@ gamma Phi(s_2) - Phi(s_1)</div>
           It learns <code>V</code> with an asymmetric expectile loss, learns <code>Q</code> by bootstrapping to
           <code>V</code>, then extracts a policy with AWR-style weighted behavior cloning.
         </p>
+        <div class="worked">
+          <h4>IQL Before The Equations</h4>
+          <p>
+            IQL is trying to be optimistic inside the dataset without ever asking
+            <span class="math-inline">max<sub>a</sub>Q(s,a)</span> over unseen actions. It learns a value
+            <span class="math-inline">V(s)</span> that tracks the better actions available in the dataset, then
+            uses that value as the bootstrap target for Q-learning.
+          </p>
+          <p>
+            Read expectile regression as a tilted squared loss. It punishes errors on one side more than the other,
+            so <span class="math-inline">V(s)</span> can be fit closer to high dataset Q-values than to the average
+            dataset Q-value.
+          </p>
+        </div>
         <div class="plain-equation">
           <span class="eq-caption">Expectile loss for residual x = V(s) - Q(s,a)</span>
           <span class="eq-main">ℓ<sub>λ</sub><sup>2</sup>(x) = (1-λ)x<sup>2</sup> if x &lt; 0, and λx<sup>2</sup> if x ≥ 0</span>
@@ -2670,11 +2759,31 @@ gamma Phi(s_2) - Phi(s_1)</div>
             <span class="math-inline">max<sub>a</sub> Q(s,a)</span> over actions the dataset may never contain.
           </p>
         </div>
+        <div class="component-list">
+          <div>
+            <strong>x = V(s) - Q(s,a)</strong>
+            <span>The residual: how far the value estimate is from the Q estimate for a dataset action.</span>
+          </div>
+          <div>
+            <strong>expectile loss</strong>
+            <span>A squared loss that weights overestimates and underestimates differently.</span>
+          </div>
+          <div>
+            <strong>r + γV̂(s')</strong>
+            <span>The TD target for Q. Notice there is no <span class="math-inline">max<sub>a</sub></span> over unseen actions.</span>
+          </div>
+          <div>
+            <strong>exp((Q̂ - V̂)/α)</strong>
+            <span>The AWR-style imitation weight. Dataset actions with higher estimated advantage are copied more.</span>
+          </div>
+        </div>
 
         <div class="trap">
           <strong>Upper expectile convention in the reference sheet.</strong> The sheet says upper expectile uses
-          <code>lambda &lt; 1/2</code> because the residual is defined as <code>x = V(s) - Q(s,a)</code>. With this
-          sign convention, under-placing <code>V</code> relative to high <code>Q</code> values is penalized more.
+          <span class="math-inline">λ &lt; 1/2</span> because the residual is defined as
+          <span class="math-inline">x = V(s) - Q(s,a)</span>. With this
+          sign convention, under-placing <span class="math-inline">V</span> relative to high
+          <span class="math-inline">Q</span> values is penalized more.
         </div>
 
         <details class="question">
@@ -2682,7 +2791,7 @@ gamma Phi(s_2) - Phi(s_1)</div>
           <div class="answer">
             <span class="answer-label">Answer.</span>
             Basic AWR's Monte Carlo returns can be high-variance, and its advantages are tied to the behavior
-            policy <code>pi_beta</code>. IQL uses TD-style learning and estimates values for a better policy within
+            policy <span class="math-inline">π<sub>β</sub></span>. IQL uses TD-style learning and estimates values for a better policy within
             dataset support.
           </div>
         </details>
@@ -2709,6 +2818,13 @@ gamma Phi(s_2) - Phi(s_1)</div>
           Humans often find pairwise comparisons easier than calibrated scalar ratings. Instead of asking
           "what reward score is this trajectory?", ask "which trajectory is better?"
         </p>
+        <div class="worked">
+          <h4>Preference Learning In One Sentence</h4>
+          <p>
+            Train a reward model so that the human-preferred trajectory gets a higher total reward score than the
+            rejected trajectory.
+          </p>
+        </div>
         <div class="plain-equation">
           <span class="eq-caption">Trajectory reward</span>
           <span class="eq-main">r<sub>θ</sub>(τ) = Σ<sub>(s,a)∈τ</sub> r<sub>θ</sub>(s,a)</span>
@@ -2725,6 +2841,12 @@ gamma Phi(s_2) - Phi(s_1)</div>
             <span class="math-inline">6 - 2 = 4</span>, then applies a sigmoid, giving high probability that A is
             preferred. If the human preferred B, the loss pushes the reward model to lower A's score or raise B's.
           </p>
+        </div>
+        <div class="component-list">
+          <div><strong>τ<sub>w</sub></strong><span>The winning trajectory, response, or completion preferred by the human.</span></div>
+          <div><strong>τ<sub>l</sub></strong><span>The losing trajectory, response, or completion.</span></div>
+          <div><strong>r<sub>θ</sub>(τ)</strong><span>The reward model's total score for a whole trajectory.</span></div>
+          <div><strong>sigmoid(score difference)</strong><span>Converts "winner score minus loser score" into a probability between 0 and 1.</span></div>
         </div>
 
         <h3>RLHF Pipeline</h3>
@@ -2804,9 +2926,13 @@ gamma Phi(s_2) - Phi(s_1)</div>
         <h3>Core Idea</h3>
         <p>
           Model-based RL learns or uses a model of the world, usually
-          <code>p_theta(s_{t+1} | s_t, a_t)</code>. Sometimes it also learns a reward model
-          <code>r_theta(s_t,a_t)</code>.
+          <span class="math-inline">p<sub>θ</sub>(s<sub>t+1</sub> | s<sub>t</sub>, a<sub>t</sub>)</span>. Sometimes it also learns a reward model
+          <span class="math-inline">r<sub>θ</sub>(s<sub>t</sub>,a<sub>t</sub>)</span>.
         </p>
+        <div class="note">
+          Model-free RL learns from real or replayed experience. Model-based RL learns a simulator-like model and
+          uses it to imagine what could happen before choosing or training actions.
+        </div>
 
         <div class="plain-equation">
           <span class="eq-caption">Dynamics model</span>
@@ -2839,6 +2965,16 @@ gamma Phi(s_2) - Phi(s_1)</div>
           The planner itself can be the policy. At state <code>s_t</code>, sample candidate action sequences, roll them
           out in the learned model, score them, execute the first action of the best sequence, then replan next step.
         </p>
+        <div class="worked">
+          <h4>Planning Without The Notation</h4>
+          <ol>
+            <li>At the current state, sample many possible future action sequences.</li>
+            <li>Use the learned dynamics model to imagine what states those actions would lead to.</li>
+            <li>Score each imagined future by predicted rewards, optionally plus a terminal value estimate.</li>
+            <li>Execute only the first action from the best sequence.</li>
+            <li>Observe the real next state and plan again.</li>
+          </ol>
+        </div>
         <div class="plain-equation">
           <span class="eq-caption">Model rollout setup</span>
           <span class="eq-main">sample N action sequences a<sup>i</sup><sub>t:t+H</sub>, then roll them out with p<sub>θ</sub> to get ŝ<sup>i</sup><sub>t+1:t+H+1</sub></span>
@@ -2859,10 +2995,17 @@ gamma Phi(s_2) - Phi(s_1)</div>
             because the real world may differ from the model's prediction.
           </p>
         </div>
+        <div class="component-list">
+          <div><strong>H</strong><span>The planning horizon: how many future steps the model imagines.</span></div>
+          <div><strong>i</strong><span>Which candidate action sequence we are evaluating.</span></div>
+          <div><strong>ŝ</strong><span>An imagined state predicted by the learned model, not necessarily the real future state.</span></div>
+          <div><strong>i*</strong><span>The index of the candidate sequence with the highest predicted score.</span></div>
+          <div><strong>V̂(ŝ<sub>t+H+1</sub>)</strong><span>A terminal value estimate for what happens after the imagined horizon ends.</span></div>
+        </div>
 
         <h3>Why Greedy One-Step Reward Is Not Enough</h3>
         <p>
-          Choosing <code>argmax_a r_theta(s_t,a)</code> ignores future consequences. The pancake robot from the
+          Choosing <span class="math-inline">argmax<sub>a</sub> r<sub>θ</sub>(s<sub>t</sub>,a)</span> ignores future consequences. The pancake robot from the
           practice problem might get immediate syrup reward while ruining the final pattern. Planning uses
           multi-step predicted return.
         </p>
@@ -2919,6 +3062,15 @@ gamma Phi(s_2) - Phi(s_1)</div>
           Goal-conditioned RL is a special case where <code>z</code> is a goal, often a goal state
           <code>s_g</code>. The policy learns <code>pi(a | s, s_g)</code>.
         </p>
+        <div class="worked">
+          <h4>What The Goal Input Does</h4>
+          <p>
+            The same state can require different actions for different goals. If the goal is
+            <span class="math-inline">s<sub>g</sub></span>, then
+            <span class="math-inline">π(a|s,s<sub>g</sub>)</span> means: choose an action using both the current
+            state and the desired goal. The goal is part of the policy input.
+          </p>
+        </div>
 
         <h3>Hindsight Relabeling / HER</h3>
         <p>
