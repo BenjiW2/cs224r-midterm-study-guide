@@ -1765,11 +1765,18 @@ gamma Phi(s_2) - Phi(s_1)</div>
             is a fake generation-time coordinate: start with random noise, then repeatedly move it toward a real
             expert action.
           </p>
+          <div class="note">
+            <strong>What is <span class="math-inline">v<sub>θ</sub></span>?</strong> It is the neural network in this
+            method. Its job is not to output the final action directly. Its job is to look at the current state
+            <span class="math-inline">s<sub>t</sub></span>, the current noisy/partial action
+            <span class="math-inline">a<sub>t,τ</sub></span>, and fake time <span class="math-inline">τ</span>, then
+            output a direction to move that action sample.
+          </div>
           <div class="component-list">
             <div><strong>a<sub>t,0</sub></strong><span>A noisy initial action sample. The second subscript <span class="math-inline">0</span> means generation step zero.</span></div>
             <div><strong>a<sub>t,τ</sub></strong><span>The current partially-denoised action at fake generation time <span class="math-inline">τ</span>.</span></div>
             <div><strong>a<sub>t</sub></strong><span>The real expert action we want to end up near.</span></div>
-            <div><strong>v<sub>θ</sub>(...)</strong><span>A learned velocity: which direction should the current action sample move?</span></div>
+            <div><strong>v<sub>θ</sub>(...)</strong><span>The neural net's predicted movement direction for the current action sample.</span></div>
             <div><strong>ODE</strong><span>The continuous version: keep moving the action according to the velocity field.</span></div>
             <div><strong>Euler step</strong><span>The computer version: approximate that movement with many small steps.</span></div>
           </div>
@@ -1784,6 +1791,11 @@ gamma Phi(s_2) - Phi(s_1)</div>
                 <span class="math-inline">a<sub>t,τ</sub></span> moves in the direction predicted by the neural net
                 <span class="math-inline">v<sub>θ</sub></span>. The neural net sees the state, the current action
                 sample, and the fake time.
+              </p>
+              <p>
+                Example: if the current sample is too far to the right and the expert action is left, a good
+                <span class="math-inline">v<sub>θ</sub></span> outputs a negative direction, meaning "move this sample
+                left."
               </p>
             </div>
             <div class="case-card">
