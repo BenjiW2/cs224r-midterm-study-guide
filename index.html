@@ -1846,6 +1846,43 @@ gamma Phi(s_2) - Phi(s_1)</div>
           goes. Roll out the policy, ask the expert to label or intervene at encountered states, aggregate the data,
           and retrain. This is stronger than pure offline BC, but requires online execution and expert access.
         </p>
+        <div class="worked">
+          <h4>DAgger In One Loop</h4>
+          <ol>
+            <li>Train an initial policy from expert demonstrations.</li>
+            <li>Run that learned policy in the environment.</li>
+            <li>It visits states caused by its own mistakes, not just clean expert states.</li>
+            <li>Ask the expert what action should be taken in those visited states.</li>
+            <li>Add those new expert-labeled examples to the dataset.</li>
+            <li>Retrain the policy on the aggregated dataset.</li>
+          </ol>
+          <p>
+            The word "aggregate" is the key: do not throw away old data. Keep adding new expert-labeled states to
+            the dataset so the policy learns both normal expert states and recovery states.
+          </p>
+        </div>
+        <div class="component-list">
+          <div>
+            <strong>Offline BC</strong>
+            <span>Train once on fixed expert data. Simple, but the policy may fail in states the expert data never covered.</span>
+          </div>
+          <div>
+            <strong>DAgger</strong>
+            <span>Collect labels on states the learned policy actually reaches. Better for compounding errors, but needs online rollouts and expert labels.</span>
+          </div>
+          <div>
+            <strong>Online intervention</strong>
+            <span>The expert may take over or correct the policy during rollout. Those correction states become training data.</span>
+          </div>
+          <div>
+            <strong>Why it helps</strong>
+            <span>It changes the training distribution to include the states the learned policy will see at test time.</span>
+          </div>
+        </div>
+        <div class="trap">
+          <strong>Exam trap.</strong> DAgger is not magic reinforcement learning. It is still supervised learning on
+          expert labels. The difference is how the states are collected: from the learned policy's own rollouts.
+        </div>
 
         <details class="question">
           <summary>Check: why can behavior cloning fail even if validation loss on expert data is low?</summary>
@@ -1854,6 +1891,14 @@ gamma Phi(s_2) - Phi(s_1)</div>
             Validation loss measures expert-distribution states. Deployment states come from the learned policy.
             A tiny action error can move the agent into unfamiliar states, where the supervised model has no
             reason to be accurate.
+          </div>
+        </details>
+        <details class="question">
+          <summary>Check: what extra resource does DAgger need that offline behavior cloning does not?</summary>
+          <div class="answer">
+            <span class="answer-label">Answer.</span>
+            Online interaction plus expert labeling or intervention on the states the learned policy visits.
+            That is why DAgger can fix distribution shift, but is more expensive than offline BC.
           </div>
         </details>
       </section>
