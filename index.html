@@ -1728,16 +1728,34 @@ gamma Phi(s_2) - Phi(s_1)</div>
           start with random noise, then learn how to push that noise into an expert-like action.
         </p>
         <div class="worked">
-          <h4>Noise To Action Picture</h4>
-          <ol>
-            <li>Start with a random action-like vector, such as "random steering command."</li>
-            <li>Look at the current state <span class="math-inline">s<sub>t</sub></span>.</li>
-            <li>Use a neural net to predict a direction to move the random vector.</li>
-            <li>Repeat small moves until the vector becomes a realistic action.</li>
-          </ol>
+          <h4>Concrete Example: Steering Around An Obstacle</h4>
           <p>
-            Because the process starts from random noise, different noise samples can turn into different good
-            actions. That is how it can represent both "go left" and "go right" instead of averaging them.
+            Suppose the action is one number:
+            <span class="math-inline">-1</span> means steer hard left,
+            <span class="math-inline">0</span> means go straight, and
+            <span class="math-inline">+1</span> means steer hard right.
+          </p>
+          <p>
+            In this state, both <span class="math-inline">-1</span> and <span class="math-inline">+1</span> are good,
+            because either one goes around the obstacle. But <span class="math-inline">0</span> is bad, because it
+            drives into the obstacle.
+          </p>
+          <div class="component-list">
+            <div><strong>Bad regression behavior</strong><span>Average <span class="math-inline">-1</span> and <span class="math-inline">+1</span> to get <span class="math-inline">0</span>.</span></div>
+            <div><strong>What we want</strong><span>Sometimes output <span class="math-inline">-1</span>, sometimes output <span class="math-inline">+1</span>, but do not average them.</span></div>
+          </div>
+          <p>
+            Flow matching gives the policy a way to do that. It starts from a random number and moves it toward a
+            realistic expert action. One random start might get moved toward <span class="math-inline">-1</span>.
+            Another random start might get moved toward <span class="math-inline">+1</span>.
+          </p>
+          <div class="plain-equation">
+            <span class="eq-main">random noise → small neural-net nudges → final action</span>
+            <span class="eq-caption">Different random starts can become different valid actions.</span>
+          </div>
+          <p>
+            That is all the "noise to action" idea means. It is not saying the robot takes random actions in the
+            environment. It is saying the policy uses internal randomness to generate one of several plausible actions.
           </p>
         </div>
         <div class="formula">ODE:
