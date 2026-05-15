@@ -675,7 +675,7 @@ G_t = r_t + gamma r_{t+1} + gamma^2 r_{t+2} + ...</div>
           <tbody>
             <tr>
               <td><code>π<sub>θ</sub>(a|s)</code></td>
-              <td>Policy with parameters theta: probability of action a in state s</td>
+              <td>Policy with parameters θ: probability of action a in state s</td>
               <td>"What would my neural net do here?"</td>
             </tr>
             <tr>
@@ -700,7 +700,7 @@ G_t = r_t + gamma r_{t+1} + gamma^2 r_{t+2} + ...</div>
             </tr>
             <tr>
               <td><code>∇θ</code></td>
-              <td>Gradient with respect to theta</td>
+              <td>Gradient with respect to θ</td>
               <td>"Which way should I move the neural net weights?"</td>
             </tr>
           </tbody>
@@ -1957,9 +1957,11 @@ gamma Phi(s_2) - Phi(s_1)</div>
           <span class="eq-main">p<sub>θ</sub>(τ) = p(s<sub>1</sub>) Π<sub>t</sub> π<sub>θ</sub>(a<sub>t</sub> | s<sub>t</sub>) p(s<sub>t+1</sub> | s<sub>t</sub>, a<sub>t</sub>)</span>
         </div>
         <p>
-          But <code>p(s_1)</code> and <code>p(s_{t+1} | s_t, a_t)</code> do not depend on <code>theta</code>.
+          But <span class="math-inline">p(s<sub>1</sub>)</span> and
+          <span class="math-inline">p(s<sub>t+1</sub> | s<sub>t</sub>, a<sub>t</sub>)</span>
+          do not depend on <span class="math-inline">θ</span>.
           Therefore, their gradients are zero. The policy-gradient estimator only needs
-          <code>grad log pi_theta(a_t | s_t)</code>.
+          <span class="math-inline">∇<sub>θ</sub> log π<sub>θ</sub>(a<sub>t</sub> | s<sub>t</sub>)</span>.
         </p>
         <div class="note">
           <strong>Careful:</strong> the environment dynamics still affect which trajectories and rewards you see.
@@ -2934,6 +2936,7 @@ gamma Phi(s_2) - Phi(s_1)</div>
         lambda: "λ",
         theta: "θ",
         phi: "φ",
+        Phi: "Φ",
         psi: "ψ",
         pi: "π",
         tau: "τ",
@@ -2960,7 +2963,7 @@ gamma Phi(s_2) - Phi(s_1)</div>
         .replace(/~/g, "∼")
         .replace(/'/g, "′");
 
-      const greekify = (value) => value.replace(/\b(alpha|beta|gamma|delta|epsilon|eps|lambda|theta|phi|psi|pi|tau|rho|sigma)\b/g, (_, word) => greek[word]);
+      const greekify = (value) => value.replace(/\b(alpha|beta|gamma|delta|epsilon|eps|lambda|theta|phi|Phi|psi|pi|tau|rho|sigma)\b/g, (_, word) => greek[word]);
 
       function toPlainMath(raw) {
         let value = normalizeMathText(String(raw));
@@ -3040,6 +3043,17 @@ gamma Phi(s_2) - Phi(s_1)</div>
         const original = block.textContent.replace(/\n+$/g, "");
         block.classList.add("rendered-formula");
         block.innerHTML = original.split("\n").map(lineToHtml).join("");
+      });
+
+      const mathCodePattern = /(?:_|\{|\}|theta|gamma|eta|tau|Phi|pi_|p_|r_|v_|D_|L_|grad|log\s+p|π|θ|γ|τ|Φ|∇|\||\b[pQVAJGL]\s*(?:\(|=)|\bmax_a\b|\bargmax_a\b)/;
+      document.querySelectorAll("code").forEach((node) => {
+        if (node.children.length) return;
+        const raw = node.textContent.trim();
+        if (!mathCodePattern.test(raw)) return;
+        const span = document.createElement("span");
+        span.className = "math-inline";
+        span.innerHTML = formatInline(raw);
+        node.replaceWith(span);
       });
     })();
   </script>
