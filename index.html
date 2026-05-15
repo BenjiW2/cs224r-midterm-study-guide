@@ -2857,6 +2857,42 @@ gamma Phi(s_2) - Phi(s_1)</div>
         </div>
 
         <h3>n-Step Q-Learning</h3>
+        <p>
+          n-step Q-learning is the same idea as 1-step Q-learning, but it waits for more real rewards before using a
+          Q-network guess for the remaining future.
+        </p>
+        <div class="worked">
+          <h4>What "Bootstrap From Q" Means</h4>
+          <p>
+            To bootstrap means: stop using real observed rewards and plug in the Q-network's estimate for the rest
+            of the future. In n-step Q-learning, we use <span class="math-inline">n</span> real rewards, arrive at
+            state <span class="math-inline">s<sub>t+n</sub></span>, then ask the Q-network:
+            "from this state, what is the value of the best next action?"
+          </p>
+          <div class="plain-equation">
+            <span class="eq-main">bootstrap term = γ<sup>n</sup> max<sub>a</sub> Q̂(s<sub>t+n</sub>, a)</span>
+          </div>
+        </div>
+        <div class="worked">
+          <h4>1-Step, 2-Step, 3-Step Targets</h4>
+          <div class="component-list">
+            <div>
+              <strong>1-step</strong>
+              <span><span class="math-inline">r<sub>t</sub> + γ max<sub>a</sub>Q̂(s<sub>t+1</sub>,a)</span></span>
+            </div>
+            <div>
+              <strong>2-step</strong>
+              <span><span class="math-inline">r<sub>t</sub> + γr<sub>t+1</sub> + γ<sup>2</sup> max<sub>a</sub>Q̂(s<sub>t+2</sub>,a)</span></span>
+            </div>
+            <div>
+              <strong>3-step</strong>
+              <span><span class="math-inline">r<sub>t</sub> + γr<sub>t+1</sub> + γ<sup>2</sup>r<sub>t+2</sub> + γ<sup>3</sup> max<sub>a</sub>Q̂(s<sub>t+3</sub>,a)</span></span>
+            </div>
+          </div>
+          <p>
+            The pattern is: more real rewards first, then one Q-network guess at the end.
+          </p>
+        </div>
         <div class="plain-equation">
           <span class="eq-caption">n-step Q target</span>
           <span class="eq-main">y<sub>i,t</sub><sup>(n)</sup> = Σ<sub>t'=t</sub><sup>t+n-1</sup> γ<sup>t'-t</sup> r<sub>i,t'</sub> + γ<sup>n</sup> max<sub>a</sub> Q̂(s<sub>i,t+n</sub>, a)</span>
@@ -2868,6 +2904,22 @@ gamma Phi(s_2) - Phi(s_1)</div>
             then bootstrap from Q at the state after those <span class="math-inline">n</span> steps. This can reduce
             bootstrap bias, but if the replay trajectory came from an old behavior policy, those intermediate
             actions may not match the policy you are trying to evaluate.
+          </p>
+        </div>
+        <div class="worked">
+          <h4>Small Numeric Example</h4>
+          <p>
+            Suppose <span class="math-inline">γ=0.9</span>, rewards are
+            <span class="math-inline">r<sub>t</sub>=1</span> and
+            <span class="math-inline">r<sub>t+1</sub>=2</span>, and at state
+            <span class="math-inline">s<sub>t+2</sub></span> the best Q-network value is
+            <span class="math-inline">10</span>. The 2-step target is:
+          </p>
+          <div class="plain-equation">
+            <span class="eq-main">1 + 0.9 · 2 + 0.9<sup>2</sup> · 10 = 1 + 1.8 + 8.1 = 10.9</span>
+          </div>
+          <p>
+            The first two terms are real observed rewards. The final term is the bootstrapped Q estimate.
           </p>
         </div>
         <p>
