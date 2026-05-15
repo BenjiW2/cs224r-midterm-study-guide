@@ -3382,6 +3382,36 @@ gamma Phi(s_2) - Phi(s_1)</div>
           <li>Use RL, often PPO-style, to optimize the language model against the learned reward, usually with a KL penalty to stay close to the original model.</li>
         </ol>
         <div class="worked">
+          <h4>How The Language Model Actually Gets Updated</h4>
+          <p>
+            During RLHF, the language model is treated as the policy. Its action is choosing tokens. Its parameters
+            are the neural-net weights <span class="math-inline">θ</span>. PPO-style RL updates those weights so
+            high-reward responses become more likely and low-reward responses become less likely.
+          </p>
+          <div class="component-list">
+            <div>
+              <strong>1. Sample a response</strong>
+              <span>Given a prompt, the current model <span class="math-inline">π<sub>θ</sub></span> generates tokens. The model also knows the log probability it assigned to each generated token.</span>
+            </div>
+            <div>
+              <strong>2. Score the response</strong>
+              <span>The reward model gives the whole response a learned reward score. Then subtract a KL penalty if the response distribution moved too far from <span class="math-inline">π<sub>ref</sub></span>.</span>
+            </div>
+            <div>
+              <strong>3. Compute an advantage</strong>
+              <span>Ask: was this response better or worse than expected? Positive advantage means reinforce it; negative advantage means make it less likely.</span>
+            </div>
+            <div>
+              <strong>4. Gradient update</strong>
+              <span>Use the policy-gradient idea: change <span class="math-inline">θ</span> to increase the log probability of tokens in good responses and decrease it for bad responses, with PPO clipping to keep the update from being too large.</span>
+            </div>
+          </div>
+          <p>
+            So the reward model does not directly rewrite the answer. It supplies the reward number. The PPO update
+            uses that number to change the language model's weights.
+          </p>
+        </div>
+        <div class="worked">
           <h4>What The KL Penalty Is Doing</h4>
           <p>
             KL divergence measures how different two probability distributions are. In RLHF, the two distributions
