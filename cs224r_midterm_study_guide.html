@@ -2303,7 +2303,7 @@ gamma Phi(s_2) - Phi(s_1)</div>
         <div class="plain-equation">
           <span class="eq-caption">Compact n-step advantage formula</span>
           <span class="eq-main">Â<sub>n</sub>(s<sub>t</sub>,a<sub>t</sub>) = [Σ<sub>k=0</sub><sup>n-1</sup> γ<sup>k</sup>r<sub>t+k</sub> + γ<sup>n</sup>V̂(s<sub>t+n</sub>)] - V̂(s<sub>t</sub>)</span>
-          <span class="eq-caption">GAE blends these n-step estimates with weights proportional to λ<sup>n-1</sup>.</span>
+          <span class="eq-caption">This formula uses γ because it is still a discounted return estimate.</span>
         </div>
         <div class="component-list">
           <div>
@@ -2322,6 +2322,30 @@ gamma Phi(s_2) - Phi(s_1)</div>
             <strong>- V̂(s<sub>t</sub>)</strong>
             <span>Subtract the baseline value of the starting state to turn a value estimate into an advantage estimate.</span>
           </div>
+        </div>
+        <div class="plain-equation">
+          <span class="eq-caption">GAE mixing formula</span>
+          <span class="eq-main">Â<sub>GAE</sub> = weighted average of Â<sub>1</sub>, Â<sub>2</sub>, Â<sub>3</sub>, ...</span>
+          <span class="eq-main">weight on Â<sub>n</sub> is proportional to λ<sup>n-1</sup></span>
+        </div>
+        <div class="worked">
+          <h4>γ Versus λ</h4>
+          <div class="component-list">
+            <div>
+              <strong>γ</strong>
+              <span>Discounts future rewards inside each n-step estimate. It answers: how much should later rewards count?</span>
+            </div>
+            <div>
+              <strong>λ</strong>
+              <span>Mixes different horizon estimates. It answers: how much should GAE use long-horizon estimates instead of mostly 1-step estimates?</span>
+            </div>
+          </div>
+          <p>
+            So <span class="math-inline">γ</span> appears inside <span class="math-inline">Â<sub>n</sub></span>.
+            <span class="math-inline">λ</span> appears when GAE combines
+            <span class="math-inline">Â<sub>1</sub>, Â<sub>2</sub>, Â<sub>3</sub>, ...</span> into one final
+            advantage estimate.
+          </p>
         </div>
         <div class="worked">
           <h4>What GAE Is Blending</h4>
