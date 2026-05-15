@@ -2941,6 +2941,24 @@ gamma Phi(s_2) - Phi(s_1)</div>
       <section id="offline">
         <h2>Offline RL</h2>
 
+        <div class="worked">
+          <h4>Online RL Versus Offline RL</h4>
+          <div class="component-list">
+            <div>
+              <strong>Online RL</strong>
+              <span>The agent can keep interacting with the environment while learning. If it tries an action, it can observe what actually happens.</span>
+            </div>
+            <div>
+              <strong>Offline RL</strong>
+              <span>The agent only gets a fixed dataset collected earlier. It cannot test new actions in the environment during training.</span>
+            </div>
+          </div>
+          <p>
+            This is different from "online network" in DQN. There, online means the network currently being updated.
+            Here, online means the learner can collect new environment experience.
+          </p>
+        </div>
+
         <h3>The Problem</h3>
         <p>
           Offline RL trains only on a fixed dataset <span class="math-inline">D</span> collected by a behavior policy
