@@ -3680,6 +3680,24 @@ gamma Phi(s_2) - Phi(s_1)</div>
           Instead of one MDP, we have a task distribution. Tasks may differ in rewards, dynamics, initial states,
           action spaces, or goals. The key practical idea is to condition the policy on the task.
         </p>
+        <div class="worked">
+          <h4>One Task Versus Many Tasks</h4>
+          <p>
+            In ordinary RL, the agent learns one behavior for one problem, like "open this door." In multi-task RL,
+            the training set contains many related problems, like "open the door," "close the drawer," "pick up the
+            mug," and "wipe the table." The policy must know which task it is supposed to solve right now.
+          </p>
+          <div class="component-list">
+            <div>
+              <strong>Single-task policy</strong>
+              <span><span class="math-inline">π(a|s)</span>: action depends only on the current state.</span>
+            </div>
+            <div>
+              <strong>Multi-task policy</strong>
+              <span><span class="math-inline">π(a|s,z)</span>: action depends on the current state and a task description <span class="math-inline">z</span>.</span>
+            </div>
+          </div>
+        </div>
         <div class="plain-equation">
           <span class="eq-caption">Task-conditioned policy</span>
           <span class="eq-main">π<sub>θ</sub>(a | s, z)</span>
@@ -3694,6 +3712,31 @@ gamma Phi(s_2) - Phi(s_1)</div>
             "make coffee" or "clean the counter."
           </p>
         </div>
+        <div class="worked">
+          <h4>What z Can Be</h4>
+          <p>
+            <span class="math-inline">z</span> is the extra information that tells the policy which task it is doing.
+            It is not always a latent variable; sometimes it is directly observed.
+          </p>
+          <div class="component-list">
+            <div>
+              <strong>Task ID</strong>
+              <span><span class="math-inline">z = 3</span> might mean "open drawer." This is common in clean benchmark setups.</span>
+            </div>
+            <div>
+              <strong>Goal state</strong>
+              <span><span class="math-inline">z = s<sub>g</sub></span>, an image or state describing what success should look like.</span>
+            </div>
+            <div>
+              <strong>Language instruction</strong>
+              <span><span class="math-inline">z</span> might be text like "put the red block on the blue block."</span>
+            </div>
+            <div>
+              <strong>Context / latent task</strong>
+              <span>If the task is not directly given, the agent may infer <span class="math-inline">z</span> from recent experience, demonstrations, or rewards.</span>
+            </div>
+          </div>
+        </div>
 
         <h3>Why Share Across Tasks?</h3>
         <ul>
@@ -3701,6 +3744,27 @@ gamma Phi(s_2) - Phi(s_1)</div>
           <li>Data from one task may teach dynamics or skills useful for another.</li>
           <li>But imbalanced data can cause common tasks to dominate training, so stratified sampling can help.</li>
         </ul>
+        <div class="worked">
+          <h4>When Sharing Helps And When It Hurts</h4>
+          <div class="component-list">
+            <div>
+              <strong>Positive transfer</strong>
+              <span>Training on task A helps task B. Example: learning to grasp cups helps with learning to place cups.</span>
+            </div>
+            <div>
+              <strong>Negative transfer</strong>
+              <span>Training on task A hurts task B. Example: a policy overfits to pushing objects and becomes worse at lifting them.</span>
+            </div>
+            <div>
+              <strong>Task imbalance</strong>
+              <span>If 90% of data is "open drawer," the shared policy may ignore rare tasks. Balanced or stratified sampling can matter.</span>
+            </div>
+            <div>
+              <strong>Interference</strong>
+              <span>One network's weights are shared across tasks, so improving one task can accidentally degrade another.</span>
+            </div>
+          </div>
+        </div>
 
         <h3>Goal-Conditioned RL</h3>
         <p>
@@ -3715,6 +3779,27 @@ gamma Phi(s_2) - Phi(s_1)</div>
             <span class="math-inline">π(a|s,s<sub>g</sub>)</span> means: choose an action using both the current
             state and the desired goal. The goal is part of the policy input.
           </p>
+        </div>
+        <div class="worked">
+          <h4>Multitask Versus Goal-Conditioned</h4>
+          <p>
+            Goal-conditioned RL is the cleaner special case. The task is "reach this goal." General multi-task RL
+            can be broader: different reward functions, objects, users, instructions, or even dynamics.
+          </p>
+          <div class="component-list">
+            <div>
+              <strong>Goal-conditioned</strong>
+              <span><span class="math-inline">π(a|s,s<sub>g</sub>)</span>. Example: current robot state plus desired final block position.</span>
+            </div>
+            <div>
+              <strong>Instruction-conditioned</strong>
+              <span><span class="math-inline">π(a|s,\text{instruction})</span>. Example: current state plus "put the apple in the bowl."</span>
+            </div>
+            <div>
+              <strong>Task-ID-conditioned</strong>
+              <span><span class="math-inline">π(a|s,z)</span> where <span class="math-inline">z</span> is a discrete task label. Example: task 1 is reach, task 2 is push.</span>
+            </div>
+          </div>
         </div>
 
         <h3>Hindsight Relabeling / HER</h3>
@@ -3733,6 +3818,19 @@ gamma Phi(s_2) - Phi(s_1)</div>
         <div class="note">
           Hindsight relabeling needs compatible dynamics across goals or tasks and is naturally paired with
           off-policy algorithms using a replay buffer.
+        </div>
+        <div class="worked">
+          <h4>Why HER Is Usually Off-Policy</h4>
+          <p>
+            HER changes the goal label after the trajectory was collected. That means the relabeled transition was
+            not necessarily generated by the current policy trying to solve that relabeled goal. Off-policy methods
+            can train from stored replay transitions anyway, which is why HER pairs naturally with replay-buffer
+            algorithms.
+          </p>
+        </div>
+        <div class="trap">
+          <strong>Practice trap.</strong> Do not say HER invents new physics. It does not change what happened.
+          It changes the interpretation of what goal the trajectory was successful for.
         </div>
 
         <details class="question">
