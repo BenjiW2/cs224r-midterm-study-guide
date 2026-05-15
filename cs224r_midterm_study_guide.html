@@ -3127,7 +3127,15 @@ gamma Phi(s_2) - Phi(s_1)</div>
           <div class="component-list">
             <div>
               <strong>Line 1: ℓ<sub>λ</sub><sup>2</sup>(x)</strong>
-              <span>This defines the special error penalty used to fit <span class="math-inline">V(s)</span>. It is still squared error, but one side of the error costs more than the other. <span class="math-inline">λ</span> is the knob that chooses which side gets punished more.</span>
+              <span>This defines the special error penalty used to fit <span class="math-inline">V(s)</span>. It is still squared error, but it treats the two cases <span class="math-inline">V(s) &lt; Q(s,a)</span> and <span class="math-inline">V(s) &gt; Q(s,a)</span> differently.</span>
+            </div>
+            <div>
+              <strong>What V(s) is in IQL</strong>
+              <span><span class="math-inline">V(s)</span> is the value network's single score for state <span class="math-inline">s</span>. It answers: "how good is this state, if I choose a good dataset-supported action from here?" It does not name an action; it is just one number for the state.</span>
+            </div>
+            <div>
+              <strong>What "the two sides" are</strong>
+              <span>The residual is <span class="math-inline">x = V(s)-Q(s,a)</span>. If <span class="math-inline">x &lt; 0</span>, then <span class="math-inline">V(s)</span> is below this action's Q-value. If <span class="math-inline">x &gt; 0</span>, then <span class="math-inline">V(s)</span> is above this action's Q-value. <span class="math-inline">λ</span> decides which mistake costs more.</span>
             </div>
             <div>
               <strong>What λ means here</strong>
@@ -3150,6 +3158,26 @@ gamma Phi(s_2) - Phi(s_1)</div>
             The important exam distinction: the Q update uses <span class="math-inline">V(s')</span>, not
             <span class="math-inline">max<sub>a'</sub>Q(s',a')</span>. That is the whole offline-RL safety idea:
             do not ask the Q-network to score actions that might be missing from the dataset.
+          </p>
+        </div>
+        <div class="worked">
+          <h4>What The Sides Mean Numerically</h4>
+          <p>
+            Suppose one dataset action has <span class="math-inline">Q(s,a)=10</span>.
+          </p>
+          <div class="component-list">
+            <div>
+              <strong>V(s)=7</strong>
+              <span>Then <span class="math-inline">x = 7 - 10 = -3</span>. <span class="math-inline">V(s)</span> is too low compared with that good action.</span>
+            </div>
+            <div>
+              <strong>V(s)=12</strong>
+              <span>Then <span class="math-inline">x = 12 - 10 = 2</span>. <span class="math-inline">V(s)</span> is too high compared with that action.</span>
+            </div>
+          </div>
+          <p>
+            IQL uses this asymmetric penalty so <span class="math-inline">V(s)</span> gets pulled toward the better
+            dataset actions instead of becoming a plain average over all dataset actions.
           </p>
         </div>
         <div class="worked">
