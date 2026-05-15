@@ -3127,7 +3127,11 @@ gamma Phi(s_2) - Phi(s_1)</div>
           <div class="component-list">
             <div>
               <strong>Line 1: ℓ<sub>λ</sub><sup>2</sup>(x)</strong>
-              <span>This defines the special error penalty used to fit <span class="math-inline">V(s)</span>. It is still squared error, but one side of the error costs more than the other.</span>
+              <span>This defines the special error penalty used to fit <span class="math-inline">V(s)</span>. It is still squared error, but one side of the error costs more than the other. <span class="math-inline">λ</span> is the knob that chooses which side gets punished more.</span>
+            </div>
+            <div>
+              <strong>What λ means here</strong>
+              <span><span class="math-inline">λ</span> is not the GAE lambda from the actor-critic section. In IQL, <span class="math-inline">λ</span> controls the expectile level: it decides whether <span class="math-inline">V(s)</span> behaves more like an average dataset action value or more like a high dataset action value.</span>
             </div>
             <div>
               <strong>Line 2: train V(s)</strong>
