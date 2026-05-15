@@ -3139,7 +3139,7 @@ gamma Phi(s_2) - Phi(s_1)</div>
             </div>
             <div>
               <strong>What λ means here</strong>
-              <span><span class="math-inline">λ</span> is not the GAE lambda from the actor-critic section. In IQL, <span class="math-inline">λ</span> controls the expectile level: it decides whether <span class="math-inline">V(s)</span> behaves more like an average dataset action value or more like a high dataset action value.</span>
+              <span><span class="math-inline">λ</span> is not the GAE lambda from the actor-critic section. In IQL, <span class="math-inline">λ</span> controls where <span class="math-inline">V(s)</span> lands among the dataset actions for this same state. If the dataset actions have Q-values <span class="math-inline">2, 5, 6</span>, an average-style <span class="math-inline">V(s)</span> would be near <span class="math-inline">4.3</span>. A high-action-style <span class="math-inline">V(s)</span> would be closer to <span class="math-inline">6</span>, because it is tracking the better dataset actions.</span>
             </div>
             <div>
               <strong>Line 2: train V(s)</strong>
