@@ -2064,16 +2064,58 @@ gamma Phi(s_2) - Phi(s_1)</div>
 
         <h3>On-Policy Versus Off-Policy</h3>
         <p>
-          Vanilla policy gradient is on-policy: rollouts must come from the current policy. If data comes from
-          an older policy, importance sampling can correct it:
+          This distinction is about where the training data came from.
+        </p>
+        <div class="component-list">
+          <div>
+            <strong>On-policy</strong>
+            <span>
+              Learn from data collected by the policy you are currently updating. If the policy is
+              <span class="math-inline">π<sub>θ</sub></span>, the rollouts should come from
+              <span class="math-inline">π<sub>θ</sub></span>.
+            </span>
+          </div>
+          <div>
+            <strong>Off-policy</strong>
+            <span>
+              Learn from data collected by a different policy: an older checkpoint, a replay buffer, an expert,
+              or some behavior policy <span class="math-inline">π<sub>β</sub></span>.
+            </span>
+          </div>
+        </div>
+        <div class="worked">
+          <h4>Why Vanilla Policy Gradient Is On-Policy</h4>
+          <p>
+            REINFORCE says: sample actions from the current policy, observe returns, then increase or decrease the
+            probabilities of those sampled actions. That gradient formula assumes the trajectories were sampled
+            from the same distribution that appears in the expectation:
+            <span class="math-inline">τ ~ p<sub>θ</sub>(τ)</span>.
+          </p>
+          <p>
+            If the rollout came from an old policy, the sampled actions may be common under the old policy but rare
+            under the current policy. Treating those samples as if the current policy produced them gives the wrong
+            weighting.
+          </p>
+        </div>
+        <p>
+          Importance sampling is one way to correct this mismatch. It reweights a sampled action by how likely the
+          current policy would have been to choose it compared with the policy that actually generated it:
         </p>
         <div class="plain-equation">
           <span class="eq-caption">Importance ratio</span>
-          <span class="eq-main">ρ<sub>t</sub>(θ') = π<sub>θ'</sub>(a<sub>t</sub> | s<sub>t</sub>) / π<sub>θ</sub>(a<sub>t</sub> | s<sub>t</sub>)</span>
-          <span class="eq-caption">How much more or less likely the new policy makes the sampled action than the old policy.</span>
+          <span class="eq-main">ρ<sub>t</sub> = π<sub>new</sub>(a<sub>t</sub> | s<sub>t</sub>) / π<sub>old</sub>(a<sub>t</sub> | s<sub>t</sub>)</span>
+          <span class="eq-caption">Greater than 1 means the new policy likes the sampled action more than the old policy did.</span>
         </div>
         <p>
-          But large ratios cause high variance and unstable updates. That motivates KL constraints and PPO.
+          Example: if the old policy chose action <span class="math-inline">a</span> with probability
+          <span class="math-inline">0.20</span>, but the new policy gives that same action probability
+          <span class="math-inline">0.50</span>, then <span class="math-inline">ρ = 0.50 / 0.20 = 2.5</span>.
+          That sample counts more because it is more representative of what the new policy would do.
+        </p>
+        <p>
+          The problem is that these ratios can explode. A few samples with huge ratios can dominate the update,
+          making learning high variance and unstable. That is why algorithms such as TRPO/PPO limit how far the new
+          policy is allowed to move from the old policy.
         </p>
       </section>
 
