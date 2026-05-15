@@ -2152,6 +2152,38 @@ gamma Phi(s_2) - Phi(s_1)</div>
           Actor-critic is REINFORCE with a smarter score. Instead of multiplying by raw total return, multiply by
           estimated advantage: "was this sampled action better or worse than normal in this state?"
         </div>
+        <div class="worked">
+          <h4>What The Indices Mean</h4>
+          <p>
+            The equation averages over a batch of rollout data.
+          </p>
+          <div class="component-list">
+            <div>
+              <strong>i</strong>
+              <span>Which rollout, trajectory, or sampled episode in the batch. Example: <span class="math-inline">i=3</span> means the third rollout.</span>
+            </div>
+            <div>
+              <strong>t</strong>
+              <span>Which time step inside that rollout. Example: <span class="math-inline">t=5</span> means the fifth decision in that rollout.</span>
+            </div>
+            <div>
+              <strong>s<sub>i,t</sub></strong>
+              <span>The state at time <span class="math-inline">t</span> in rollout <span class="math-inline">i</span>.</span>
+            </div>
+            <div>
+              <strong>a<sub>i,t</sub></strong>
+              <span>The action sampled at time <span class="math-inline">t</span> in rollout <span class="math-inline">i</span>.</span>
+            </div>
+            <div>
+              <strong>Σ<sub>i</sub>Σ<sub>t</sub></strong>
+              <span>Add the update contribution from every time step of every rollout in the batch.</span>
+            </div>
+            <div>
+              <strong>1/N</strong>
+              <span>Average the summed contributions. Here <span class="math-inline">N</span> is the number of sampled state-action terms being averaged.</span>
+            </div>
+          </div>
+        </div>
 
         <h3>Estimating Values</h3>
         <table>
