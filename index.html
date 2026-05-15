@@ -2806,11 +2806,53 @@ gamma Phi(s_2) - Phi(s_1)</div>
           and another to evaluate it.
         </p>
         <div class="worked">
+          <h4>What Are The Two Networks?</h4>
+          <div class="component-list">
+            <div>
+              <strong>Online Q-network</strong>
+              <span>The network being trained every gradient step. It changes quickly.</span>
+            </div>
+            <div>
+              <strong>Target Q-network</strong>
+              <span>A delayed copy of the online network. It is frozen for a while or updated slowly, so target labels are more stable.</span>
+            </div>
+          </div>
+          <p>
+            They usually have the same architecture. They are different because their weights are updated on
+            different schedules: online changes constantly; target lags behind.
+          </p>
+        </div>
+        <div class="plain-equation">
+          <span class="eq-caption">Ordinary DQN target</span>
+          <span class="eq-main">y = r + γ max<sub>a'</sub> Q<sub>target</sub>(s', a')</span>
+          <span class="eq-caption">The target network both chooses and evaluates the next action.</span>
+        </div>
+        <div class="plain-equation">
+          <span class="eq-caption">Double DQN target</span>
+          <span class="eq-main">a<sub>best</sub> = argmax<sub>a'</sub> Q<sub>online</sub>(s', a')</span>
+          <span class="eq-main">y = r + γ Q<sub>target</sub>(s', a<sub>best</sub>)</span>
+          <span class="eq-caption">Online network chooses the action; target network evaluates that chosen action.</span>
+        </div>
+        <div class="worked">
           <h4>Why Max Causes Overestimation</h4>
           <p>
             If several action values are noisy, the largest one is often large partly because of noise. The
             <span class="math-inline">max</span> operator keeps selecting those lucky overestimates. Double DQN
             reduces this by using one network to choose the action and a separate target network to score it.
+          </p>
+        </div>
+        <div class="worked">
+          <h4>Tiny Double DQN Example</h4>
+          <p>
+            Suppose in next state <span class="math-inline">s'</span>, the online network predicts:
+            <span class="math-inline">Q<sub>online</sub>(s', left)=9</span> and
+            <span class="math-inline">Q<sub>online</sub>(s', right)=7</span>. So the online network selects
+            <span class="math-inline">left</span>.
+          </p>
+          <p>
+            Now evaluate that same selected action with the target network. If
+            <span class="math-inline">Q<sub>target</sub>(s', left)=6</span>, then the bootstrapped part uses
+            <span class="math-inline">6</span>, not the online network's optimistic <span class="math-inline">9</span>.
           </p>
         </div>
 
