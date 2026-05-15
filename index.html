@@ -1667,19 +1667,24 @@ gamma Phi(s_2) - Phi(s_1)</div>
           <code>D_expert</code> contains state-action pairs from an expert. The policy learns
           <code>pi_theta(a | s)</code>.
         </p>
-        <div class="formula">Behavior cloning objective:
-min_theta E_{(s,a) ~ D_expert}[-log pi_theta(a | s)]</div>
+        <div class="plain-equation">
+          <span class="eq-caption">Behavior cloning objective</span>
+          <span class="eq-main">min<sub>θ</sub> E<sub>(s,a) ~ D<sub>expert</sub></sub>[ -log π<sub>θ</sub>(a | s) ]</span>
+        </div>
         <div class="worked">
           <h4>Read This Formula</h4>
           <div class="component-list">
+            <div><strong>min<sub>θ</sub></strong><span>Choose the policy parameters <span class="math-inline">θ</span> that make the loss as small as possible.</span></div>
+            <div><strong>E[ ... ]</strong><span>Average the loss over many expert examples.</span></div>
             <div><strong>D<sub>expert</sub></strong><span>The dataset of expert examples.</span></div>
             <div><strong>(s,a) ~ D<sub>expert</sub></strong><span>Pick an expert state-action pair from the dataset.</span></div>
             <div><strong>π<sub>θ</sub>(a | s)</strong><span>The policy's probability of the expert action in that state.</span></div>
             <div><strong>-log π<sub>θ</sub>(a | s)</strong><span>Loss is small if the expert action has high probability, large if it has low probability.</span></div>
           </div>
           <p>
-            Plain English: show the model what the expert did, and adjust <span class="math-inline">θ</span> so
-            those expert actions become more likely. This is just classification when actions are discrete.
+            Plain English: for each expert example, measure how surprised the policy is by the expert action.
+            Then adjust <span class="math-inline">θ</span> to minimize the average surprise across the dataset.
+            This makes expert actions more likely. When actions are discrete, this is just classification.
           </p>
         </div>
         <p>
