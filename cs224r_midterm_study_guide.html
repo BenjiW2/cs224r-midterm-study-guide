@@ -3635,6 +3635,31 @@ gamma Phi(s_2) - Phi(s_1)</div>
           If states are images or continuous robot configurations, you cannot enumerate all possible
           <code>(s,a)</code> pairs. A discrete action space does not make the state space small.
         </p>
+        <div class="worked">
+          <h4>What The Kitchen-Robot Options Mean</h4>
+          <p>
+            In this question, the robot's state might be an image of the kitchen plus robot joint positions. That is
+            high-dimensional: there are far too many possible states to list one by one.
+          </p>
+          <div class="component-list">
+            <div>
+              <strong>One-step greedy</strong>
+              <span>Choose the action with the highest immediate predicted reward <span class="math-inline">r(s,a)</span>. This is usually too short-sighted because cooking tasks require multi-step consequences.</span>
+            </div>
+            <div>
+              <strong>Sampling-based planning</strong>
+              <span>Sample many possible action sequences, use the learned transition model to imagine their futures, score them, execute the first action of the best sequence, then replan.</span>
+            </div>
+            <div>
+              <strong>Exact DP over all images</strong>
+              <span>Try to solve Bellman equations by enumerating every possible image state. This is not plausible because image/state spaces are enormous or continuous.</span>
+            </div>
+            <div>
+              <strong>Synthetic rollouts</strong>
+              <span>Use the learned model as a simulator to generate imagined transitions for training. This can help, but long imagined rollouts can compound model errors.</span>
+            </div>
+          </div>
+        </div>
 
         <details class="question">
           <summary>Check: for a high-dimensional kitchen robot with learned transition and reward models, which are plausible: one-step greedy, sampling-based planning, exact DP over all images, synthetic rollouts?</summary>
