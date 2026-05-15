@@ -1920,14 +1920,31 @@ gamma Phi(s_2) - Phi(s_1)</div>
         <div class="worked">
           <h4>Read REINFORCE As A Training Rule</h4>
           <div class="component-list">
-            <div><strong>Σ<sub>t</sub> ∇ log π<sub>θ</sub>(a<sub>t</sub>|s<sub>t</sub>)</strong><span>For every sampled action, compute how to change the policy to make that action more likely.</span></div>
-            <div><strong>Σ<sub>t</sub> r<sub>t</sub></strong><span>The total return of that rollout.</span></div>
-            <div><strong>Multiply them</strong><span>Good rollout: reinforce its actions. Bad rollout: push against them.</span></div>
-            <div><strong>E[ ... ]</strong><span>Average this over many sampled rollouts.</span></div>
+            <div><strong>J(θ)</strong><span>The objective: expected total reward of the current policy. We want this to go up.</span></div>
+            <div><strong>∇<sub>θ</sub>J(θ)</strong><span>The direction to move the policy parameters <span class="math-inline">θ</span> to increase expected reward.</span></div>
+            <div><strong>τ</strong><span>One full sampled trajectory: states, actions, and rewards from one rollout.</span></div>
+            <div><strong>τ ~ p<sub>θ</sub>(τ)</strong><span>Sample rollouts by running the current policy <span class="math-inline">π<sub>θ</sub></span> in the environment.</span></div>
+            <div><strong>E<sub>τ ~ p<sub>θ</sub>(τ)</sub>[...]</strong><span>Average the quantity inside brackets over many sampled rollouts.</span></div>
+            <div><strong>π<sub>θ</sub>(a<sub>t</sub>|s<sub>t</sub>)</strong><span>The probability the policy assigned to the action it actually took at time <span class="math-inline">t</span>.</span></div>
+            <div><strong>∇<sub>θ</sub> log π<sub>θ</sub>(a<sub>t</sub>|s<sub>t</sub>)</strong><span>The parameter direction that would make that sampled action more likely.</span></div>
+            <div><strong>Σ<sub>t</sub> ∇<sub>θ</sub> log π<sub>θ</sub>(a<sub>t</sub>|s<sub>t</sub>)</strong><span>Add that direction across all actions in the trajectory.</span></div>
+            <div><strong>r<sub>t</sub></strong><span>The reward received at time <span class="math-inline">t</span>.</span></div>
+            <div><strong>Σ<sub>t</sub> r<sub>t</sub></strong><span>The trajectory's total return: how good the whole rollout was.</span></div>
+            <div><strong>Multiply them</strong><span>Use the return as the strength/sign of the update for the actions in that trajectory.</span></div>
+            <div><strong>θ</strong><span>The policy weights being updated, usually neural-network weights.</span></div>
           </div>
           <p>
             This formula is the formal version of: try actions, score the rollout, then make the actions from
             high-return rollouts more likely.
+          </p>
+          <div class="plain-equation">
+            <span class="eq-caption">One sampled rollout contributes roughly</span>
+            <span class="eq-main">(direction that makes sampled actions more likely) × (how good the rollout was)</span>
+          </div>
+          <p>
+            If the rollout return is high, move in the direction that makes its sampled actions more likely. If the
+            return is low relative to a baseline, move against that direction. Vanilla REINFORCE uses total return;
+            later actor-critic methods replace this with advantage for lower variance.
           </p>
         </div>
 
