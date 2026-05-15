@@ -3300,6 +3300,28 @@ gamma Phi(s_2) - Phi(s_1)</div>
             rejected trajectory.
           </p>
         </div>
+        <div class="worked">
+          <h4>What r<sub>θ</sub>(s,a) Means</h4>
+          <p>
+            <span class="math-inline">r<sub>θ</sub>(s,a)</span> is the reward model's learned score for taking action
+            <span class="math-inline">a</span> in state <span class="math-inline">s</span>. It is not the environment's
+            original reward. It is a neural network reward estimate trained from human preferences.
+          </p>
+          <div class="component-list">
+            <div>
+              <strong>s</strong>
+              <span>The state or context. In RLHF for language models, this might include the prompt and the partial response so far.</span>
+            </div>
+            <div>
+              <strong>a</strong>
+              <span>The action. In language models, this could be the next token or a generated response chunk, depending on how the setup is written.</span>
+            </div>
+            <div>
+              <strong>θ</strong>
+              <span>The reward model's parameters: the weights of the neural network being trained to match human preferences.</span>
+            </div>
+          </div>
+        </div>
         <div class="plain-equation">
           <span class="eq-caption">Trajectory reward</span>
           <span class="eq-main">r<sub>θ</sub>(τ) = Σ<sub>(s,a)∈τ</sub> r<sub>θ</sub>(s,a)</span>
