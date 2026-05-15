@@ -3118,6 +3118,62 @@ gamma Phi(s_2) - Phi(s_1)</div>
           <span class="eq-main">π̂ ← argmax<sub>π</sub> E<sub>(s,a)~D</sub>[log π(a|s) exp((Q̂(s,a)-V̂(s))/α)]</span>
         </div>
         <div class="worked">
+          <h4>IQL Equations Decoded</h4>
+          <p>
+            Read these as three ordinary training problems, not as one mysterious mega-equation.
+            <span class="math-inline">argmin</span> means "train the network parameters so this loss gets small."
+            <span class="math-inline">argmax</span> means "train the policy parameters so this objective gets large."
+          </p>
+          <div class="component-list">
+            <div>
+              <strong>Line 1: ℓ<sub>λ</sub><sup>2</sup>(x)</strong>
+              <span>This defines the special error penalty used to fit <span class="math-inline">V(s)</span>. It is still squared error, but one side of the error costs more than the other.</span>
+            </div>
+            <div>
+              <strong>Line 2: train V(s)</strong>
+              <span>Input: dataset states and dataset actions. Goal: make <span class="math-inline">V(s)</span> close to a high-but-supported dataset action value, using the current <span class="math-inline">Q(s,a)</span> estimates as references.</span>
+            </div>
+            <div>
+              <strong>Line 3: train Q(s,a)</strong>
+              <span>Input: dataset transitions <span class="math-inline">(s,a,r,s')</span>. Goal: make <span class="math-inline">Q(s,a)</span> match the label <span class="math-inline">r + γV(s')</span>.</span>
+            </div>
+            <div>
+              <strong>Line 4: train π(a|s)</strong>
+              <span>Input: dataset state-action pairs. Goal: behavior clone the dataset, but give bigger weights to actions whose advantage <span class="math-inline">Q(s,a)-V(s)</span> is high.</span>
+            </div>
+          </div>
+          <p>
+            The important exam distinction: the Q update uses <span class="math-inline">V(s')</span>, not
+            <span class="math-inline">max<sub>a'</sub>Q(s',a')</span>. That is the whole offline-RL safety idea:
+            do not ask the Q-network to score actions that might be missing from the dataset.
+          </p>
+        </div>
+        <div class="worked">
+          <h4>One Dataset Transition Through IQL</h4>
+          <p>
+            Suppose the dataset contains this transition:
+            <span class="math-inline">s</span> = hallway,
+            <span class="math-inline">a</span> = turn left,
+            <span class="math-inline">r = 2</span>,
+            <span class="math-inline">s'</span> = near goal,
+            and <span class="math-inline">γ = 0.9</span>.
+          </p>
+          <div class="component-list">
+            <div>
+              <strong>Value estimate for the next state</strong>
+              <span>If the value network says <span class="math-inline">V(s') = 10</span>, then the bootstrapped Q label is <span class="math-inline">r + γV(s') = 2 + 0.9·10 = 11</span>.</span>
+            </div>
+            <div>
+              <strong>Q update</strong>
+              <span>If the Q-network currently predicts <span class="math-inline">Q(s,a) = 8</span>, its squared error is <span class="math-inline">(8 - 11)<sup>2</sup> = 9</span>, so training pushes <span class="math-inline">Q(s,a)</span> upward.</span>
+            </div>
+            <div>
+              <strong>Policy extraction</strong>
+              <span>Later, if <span class="math-inline">Q(s,a)-V(s)</span> is positive, the policy copies <span class="math-inline">turn left</span> strongly. If it is negative, it copies it weakly.</span>
+            </div>
+          </div>
+        </div>
+        <div class="worked">
           <h4>Read The Equations In This Order</h4>
           <ol>
             <li><strong>Fit V:</strong> make <span class="math-inline">V(s)</span> close to the upper part of the dataset action values <span class="math-inline">Q(s,a)</span>.</li>
