@@ -2184,6 +2184,41 @@ gamma Phi(s_2) - Phi(s_1)</div>
             </div>
           </div>
         </div>
+        <div class="worked">
+          <h4>What Each Factor Means</h4>
+          <div class="component-list">
+            <div>
+              <strong>π<sub>θ</sub>(a<sub>i,t</sub> | s<sub>i,t</sub>)</strong>
+              <span>The probability that the current actor assigned to the action it actually sampled in that state.</span>
+            </div>
+            <div>
+              <strong>log π<sub>θ</sub>(a<sub>i,t</sub> | s<sub>i,t</sub>)</strong>
+              <span>The log probability of that sampled action. We use log probability because its gradient gives a clean "make this sampled action more likely" direction.</span>
+            </div>
+            <div>
+              <strong>∇<sub>θ</sub> log π<sub>θ</sub>(a<sub>i,t</sub> | s<sub>i,t</sub>)</strong>
+              <span>A vector pointing in the direction to change the actor weights <span class="math-inline">θ</span> so that this exact sampled action becomes more likely in this exact state.</span>
+            </div>
+            <div>
+              <strong>Â(s<sub>i,t</sub>, a<sub>i,t</sub>)</strong>
+              <span>The critic's estimated advantage for that sampled action: how much better or worse this action was than the usual action in that state.</span>
+            </div>
+            <div>
+              <strong>Â &gt; 0</strong>
+              <span>The action was better than expected, so move with the log-probability gradient and increase its probability.</span>
+            </div>
+            <div>
+              <strong>Â &lt; 0</strong>
+              <span>The action was worse than expected, so move opposite the log-probability gradient and decrease its probability.</span>
+            </div>
+          </div>
+          <p>
+            The product
+            <span class="math-inline">∇<sub>θ</sub> log π<sub>θ</sub>(a<sub>i,t</sub>|s<sub>i,t</sub>) Â(s<sub>i,t</sub>,a<sub>i,t</sub>)</span>
+            means: "take the direction that would make this sampled action more likely, then scale or flip that
+            direction based on whether the critic says the action was good or bad."
+          </p>
+        </div>
 
         <h3>Estimating Values</h3>
         <table>
