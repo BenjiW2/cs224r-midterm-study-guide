@@ -1694,18 +1694,52 @@ gamma Phi(s_2) - Phi(s_1)</div>
 
         <h3>Why Simple Regression Can Fail</h3>
         <p>
-          Expert actions can be multi-modal. In driving, the expert might go left or right around an obstacle.
-          Squared-error regression may average those modes and produce "go straight into the obstacle."
-          The lecture's fix is expressive policy distributions: categorical distributions, Gaussian mixtures,
+          The problem is not behavior cloning itself. The problem is using a policy class that can only represent
+          one "average" action when there are multiple good expert actions.
+        </p>
+        <div class="worked">
+          <h4>The Classic Failure: Averaging Two Good Actions</h4>
+          <p>
+            Imagine a car sees an obstacle. Two expert actions are reasonable:
+          </p>
+          <div class="component-list">
+            <div><strong>Good action 1</strong><span>Steer left around the obstacle.</span></div>
+            <div><strong>Good action 2</strong><span>Steer right around the obstacle.</span></div>
+          </div>
+          <p>
+            If we train with squared-error regression, the model may average the two expert actions. The average of
+            "go left" and "go right" is "go straight," which is exactly the bad action that hits the obstacle.
+          </p>
+          <div class="plain-equation">
+            <span class="eq-main">average(good left, good right) = bad middle</span>
+            <span class="eq-caption">This is why multimodal action distributions matter.</span>
+          </div>
+        </div>
+        <p>
+          "Multi-modal" just means there are several separate good answers, not one single best action. The fix is
+          to use a policy that can represent multiple possible actions: categorical distributions, Gaussian mixtures,
           autoregressive policies, diffusion policies, or flow matching.
         </p>
 
         <h3>Flow Matching For Policies</h3>
         <p>
-          The reference sheet includes flow matching because it is one way to represent a rich action distribution.
-          The idea is to start from noise <code>a_{t,0}</code> and learn a velocity field that transports it toward
-          a real action <code>a_t</code>.
+          Flow matching is one way to build a policy that can generate many different plausible continuous actions.
+          You do not need to deeply understand differential equations for the exam. The useful mental model is:
+          start with random noise, then learn how to push that noise into an expert-like action.
         </p>
+        <div class="worked">
+          <h4>Noise To Action Picture</h4>
+          <ol>
+            <li>Start with a random action-like vector, such as "random steering command."</li>
+            <li>Look at the current state <span class="math-inline">s<sub>t</sub></span>.</li>
+            <li>Use a neural net to predict a direction to move the random vector.</li>
+            <li>Repeat small moves until the vector becomes a realistic action.</li>
+          </ol>
+          <p>
+            Because the process starts from random noise, different noise samples can turn into different good
+            actions. That is how it can represent both "go left" and "go right" instead of averaging them.
+          </p>
+        </div>
         <div class="formula">ODE:
 d a_{t,tau} / d tau = v_theta(s_t, a_{t,tau}, tau)
 
@@ -1723,10 +1757,12 @@ L_FM(theta) = (1/|D|) sum_{(s_t,a_t) in D}
             expert action.
           </p>
           <div class="component-list">
-            <div><strong>a<sub>t,0</sub></strong><span>A noisy initial action sample.</span></div>
-            <div><strong>a<sub>t</sub></strong><span>The real expert action we want to generate.</span></div>
+            <div><strong>a<sub>t,0</sub></strong><span>A noisy initial action sample. The second subscript <span class="math-inline">0</span> means generation step zero.</span></div>
+            <div><strong>a<sub>t,τ</sub></strong><span>The current partially-denoised action at fake generation time <span class="math-inline">τ</span>.</span></div>
+            <div><strong>a<sub>t</sub></strong><span>The real expert action we want to end up near.</span></div>
             <div><strong>v<sub>θ</sub>(...)</strong><span>A learned velocity: which direction should the current action sample move?</span></div>
-            <div><strong>Euler step</strong><span>Take many small steps from noise toward a realistic action.</span></div>
+            <div><strong>ODE</strong><span>The continuous version: keep moving the action according to the velocity field.</span></div>
+            <div><strong>Euler step</strong><span>The computer version: approximate that movement with many small steps.</span></div>
           </div>
           <p>
             Exam-level takeaway: flow matching is an expressive policy model for multimodal actions. It avoids
