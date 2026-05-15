@@ -2268,10 +2268,60 @@ gamma Phi(s_2) - Phi(s_1)</div>
           <span class="math-inline">Â</span> numbers used in the actor update. It is not a new policy-gradient
           objective; it is a practical way to estimate advantage with a bias/variance tradeoff.
         </p>
+        <div class="worked">
+          <h4>n-Step Advantage Without The Big Formula</h4>
+          <p>
+            Start from the same idea as 1-step TD advantage:
+          </p>
+          <div class="plain-equation">
+            <span class="eq-main">advantage = estimated value after taking the action - baseline value of the state</span>
+          </div>
+          <p>
+            The baseline is <span class="math-inline">V̂(s<sub>t</sub>)</span>. The only question is how we estimate
+            "value after taking the action."
+          </p>
+          <div class="component-list">
+            <div>
+              <strong>1-step</strong>
+              <span><span class="math-inline">[r<sub>t</sub> + γV̂(s<sub>t+1</sub>)] - V̂(s<sub>t</sub>)</span></span>
+            </div>
+            <div>
+              <strong>2-step</strong>
+              <span><span class="math-inline">[r<sub>t</sub> + γr<sub>t+1</sub> + γ<sup>2</sup>V̂(s<sub>t+2</sub>)] - V̂(s<sub>t</sub>)</span></span>
+            </div>
+            <div>
+              <strong>3-step</strong>
+              <span><span class="math-inline">[r<sub>t</sub> + γr<sub>t+1</sub> + γ<sup>2</sup>r<sub>t+2</sub> + γ<sup>3</sup>V̂(s<sub>t+3</sub>)] - V̂(s<sub>t</sub>)</span></span>
+            </div>
+          </div>
+          <p>
+            The compact equation below is just the generic version of those examples: take
+            <span class="math-inline">n</span> real rewards, add a bootstrapped value estimate at the end, then
+            subtract the baseline <span class="math-inline">V̂(s<sub>t</sub>)</span>.
+          </p>
+        </div>
         <div class="plain-equation">
-          <span class="eq-caption">n-step advantage</span>
+          <span class="eq-caption">Compact n-step advantage formula</span>
           <span class="eq-main">Â<sub>n</sub>(s<sub>t</sub>,a<sub>t</sub>) = [Σ<sub>k=0</sub><sup>n-1</sup> γ<sup>k</sup>r<sub>t+k</sub> + γ<sup>n</sup>V̂(s<sub>t+n</sub>)] - V̂(s<sub>t</sub>)</span>
           <span class="eq-caption">GAE blends these n-step estimates with weights proportional to λ<sup>n-1</sup>.</span>
+        </div>
+        <div class="component-list">
+          <div>
+            <strong>Σ<sub>k=0</sub><sup>n-1</sup></strong>
+            <span>Add up <span class="math-inline">n</span> reward terms: <span class="math-inline">k=0</span> through <span class="math-inline">k=n-1</span>.</span>
+          </div>
+          <div>
+            <strong>γ<sup>k</sup>r<sub>t+k</sub></strong>
+            <span>The reward <span class="math-inline">k</span> steps in the future, discounted by <span class="math-inline">γ<sup>k</sup></span>.</span>
+          </div>
+          <div>
+            <strong>γ<sup>n</sup>V̂(s<sub>t+n</sub>)</strong>
+            <span>After <span class="math-inline">n</span> real rewards, use the critic's guess for the remaining future.</span>
+          </div>
+          <div>
+            <strong>- V̂(s<sub>t</sub>)</strong>
+            <span>Subtract the baseline value of the starting state to turn a value estimate into an advantage estimate.</span>
+          </div>
         </div>
         <div class="worked">
           <h4>What GAE Is Blending</h4>
