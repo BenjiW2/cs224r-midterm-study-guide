@@ -3381,6 +3381,33 @@ gamma Phi(s_2) - Phi(s_1)</div>
           <li>Train a reward model to predict preference labels.</li>
           <li>Use RL, often PPO-style, to optimize the language model against the learned reward, usually with a KL penalty to stay close to the original model.</li>
         </ol>
+        <div class="worked">
+          <h4>What The KL Penalty Is Doing</h4>
+          <p>
+            KL divergence measures how different two probability distributions are. In RLHF, the two distributions
+            are usually the new policy and a frozen reference model:
+            <span class="math-inline">π<sub>θ</sub></span> versus <span class="math-inline">π<sub>ref</sub></span>.
+          </p>
+          <div class="component-list">
+            <div>
+              <strong>π<sub>ref</sub></strong>
+              <span>The original pretrained or instruction-tuned model before RLHF. It is kept frozen.</span>
+            </div>
+            <div>
+              <strong>π<sub>θ</sub></strong>
+              <span>The model currently being updated to get higher reward-model score.</span>
+            </div>
+            <div>
+              <strong>KL penalty</strong>
+              <span>A cost added when <span class="math-inline">π<sub>θ</sub></span> moves too far from <span class="math-inline">π<sub>ref</sub></span>. It says: improve, but do not become a totally different model.</span>
+            </div>
+          </div>
+          <p>
+            Why it matters: the reward model is imperfect. If RL optimizes it too aggressively, the language model
+            may find weird outputs that score highly under the reward model but are bad for humans. The KL penalty
+            slows that drift by keeping the updated model close to the original model.
+          </p>
+        </div>
 
         <h3>DPO</h3>
         <p>
