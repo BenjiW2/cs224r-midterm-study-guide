@@ -2545,6 +2545,21 @@ gamma Phi(s_2) - Phi(s_1)</div>
           <span class="math-inline">Q*</span>, the Q-value of the optimal policy, directly.
         </p>
         <div class="worked">
+          <h4>Start With One Transition</h4>
+          <p>
+            Imagine you are in state <span class="math-inline">s</span> and you take action
+            <span class="math-inline">a</span>. The environment gives immediate reward
+            <span class="math-inline">r(s,a)</span> and moves you to a next state
+            <span class="math-inline">s'</span>.
+          </p>
+          <div class="plain-equation">
+            <span class="eq-main">value of taking action a now = reward now + discounted value of what happens next</span>
+          </div>
+          <p>
+            The Bellman equations are just two different ways to fill in "what happens next."
+          </p>
+        </div>
+        <div class="worked">
           <h4>What Bellman Equations Are Doing</h4>
           <p>
             A Bellman equation is just a recursive definition of value:
@@ -2559,6 +2574,19 @@ gamma Phi(s_2) - Phi(s_1)</div>
             <div>
               <strong>Optimal control</strong>
               <span>After the first action, choose whichever next action has the largest learned Q-value.</span>
+            </div>
+          </div>
+        </div>
+        <div class="worked">
+          <h4>Two Versions In Plain English</h4>
+          <div class="component-list">
+            <div>
+              <strong>Fixed policy version</strong>
+              <span>After reaching <span class="math-inline">s'</span>, let policy <span class="math-inline">π</span> choose the next action <span class="math-inline">a'</span>. Then use <span class="math-inline">Q<sup>π</sup>(s',a')</span>.</span>
+            </div>
+            <div>
+              <strong>Optimal version</strong>
+              <span>After reaching <span class="math-inline">s'</span>, do not follow a fixed policy. Instead, look at every possible next action and use the largest <span class="math-inline">Q*(s',a')</span>.</span>
             </div>
           </div>
         </div>
@@ -2579,6 +2607,14 @@ gamma Phi(s_2) - Phi(s_1)</div>
         </div>
         <div class="component-list">
           <div>
+            <strong>r(s,a)</strong>
+            <span>The immediate reward for the transition you just took.</span>
+          </div>
+          <div>
+            <strong>γ</strong>
+            <span>Discount factor. It shrinks the value of future rewards.</span>
+          </div>
+          <div>
             <strong>s'</strong>
             <span>The next state after taking action <span class="math-inline">a</span> in state <span class="math-inline">s</span>.</span>
           </div>
@@ -2594,6 +2630,22 @@ gamma Phi(s_2) - Phi(s_1)</div>
             <strong>max<sub>a'</sub></strong>
             <span>Try all possible next actions in the formula and use the best predicted one.</span>
           </div>
+        </div>
+        <div class="worked">
+          <h4>Tiny Numeric Example</h4>
+          <p>
+            Suppose taking action <span class="math-inline">a</span> gives reward <span class="math-inline">2</span>,
+            <span class="math-inline">γ = 0.9</span>, and the next state has possible next-action values
+            <span class="math-inline">Q(s', left)=5</span> and <span class="math-inline">Q(s', right)=8</span>.
+            The optimal Bellman backup uses the best next action:
+          </p>
+          <div class="plain-equation">
+            <span class="eq-main">Q*(s,a) target = 2 + 0.9 · max(5, 8) = 2 + 7.2 = 9.2</span>
+          </div>
+          <p>
+            The fixed-policy version would average the next-action values using the policy's probabilities instead
+            of taking the max.
+          </p>
         </div>
 
         <h3>Q-Learning Target And Loss</h3>
