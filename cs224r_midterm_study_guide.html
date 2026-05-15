@@ -2700,6 +2700,35 @@ gamma Phi(s_2) - Phi(s_1)</div>
           </div>
         </div>
         <div class="worked">
+          <h4>Q̂(s<sub>i</sub>, a<sub>i</sub>) Versus max<sub>a</sub> Q̂(s<sub>i</sub>, a)</h4>
+          <p>
+            These are different questions.
+          </p>
+          <div class="component-list">
+            <div>
+              <strong>Q̂(s<sub>i</sub>, a<sub>i</sub>)</strong>
+              <span>Value of the specific action <span class="math-inline">a<sub>i</sub></span> that was actually taken in the dataset transition.</span>
+            </div>
+            <div>
+              <strong>max<sub>a</sub> Q̂(s<sub>i</sub>, a)</strong>
+              <span>Value of the best action according to the Q-network, after comparing all possible actions in state <span class="math-inline">s<sub>i</sub></span>.</span>
+            </div>
+          </div>
+          <p>
+            Example: if <span class="math-inline">a<sub>i</sub> = left</span>,
+            <span class="math-inline">Q̂(s<sub>i</sub>, left)=4</span>, and
+            <span class="math-inline">Q̂(s<sub>i</sub>, right)=9</span>, then
+            <span class="math-inline">Q̂(s<sub>i</sub>, a<sub>i</sub>) = 4</span> but
+            <span class="math-inline">max<sub>a</sub> Q̂(s<sub>i</sub>,a) = 9</span>.
+          </p>
+          <p>
+            In the Q-learning loss, the prediction is for the action actually taken:
+            <span class="math-inline">Q̂(s<sub>i</sub>,a<sub>i</sub>)</span>. The target uses
+            <span class="math-inline">max<sub>a'</sub>Q̂(s'<sub>i</sub>,a')</span> because after reaching the next
+            state, Q-learning assumes we will choose the best next action.
+          </p>
+        </div>
+        <div class="worked">
           <h4>Why There Is A Loss</h4>
           <p>
             The Q-network predicts <span class="math-inline">Q̂<sub>φ</sub>(s<sub>i</sub>,a<sub>i</sub>)</span>.
