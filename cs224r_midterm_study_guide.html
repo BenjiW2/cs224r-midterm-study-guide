@@ -2385,6 +2385,39 @@ gamma Phi(s_2) - Phi(s_1)</div>
           PPO means <strong>proximal policy optimization</strong>. "Proximal" means "nearby." PPO tries to improve
           the policy while keeping the new policy close to the old policy that collected the data.
         </p>
+        <div class="worked">
+          <h4>What PPO Actually Does</h4>
+          <p>
+            PPO is an actor-critic training loop. The clipping formula is the distinctive policy-update objective,
+            but PPO also uses rollouts, a critic, advantage estimates, and repeated updates on the same recent batch.
+          </p>
+          <ol>
+            <li>Copy the current policy and call it the old policy.</li>
+            <li>Run the old policy in the environment to collect a batch of trajectories.</li>
+            <li>Use the critic and GAE to estimate advantages for the sampled actions.</li>
+            <li>Update the actor using the clipped objective, so the new policy does not move too far from the old policy on that batch.</li>
+            <li>Update the critic to better predict returns or values.</li>
+            <li>After a few epochs on that batch, throw it away and collect fresh rollouts.</li>
+          </ol>
+        </div>
+        <div class="component-list">
+          <div>
+            <strong>old policy</strong>
+            <span>The policy that collected the batch. Its action probabilities are saved and used in the denominator of the ratio.</span>
+          </div>
+          <div>
+            <strong>new policy</strong>
+            <span>The policy after gradient updates. PPO wants it better, but not too different from the old one.</span>
+          </div>
+          <div>
+            <strong>critic</strong>
+            <span>The value model used to compute advantages, usually with GAE.</span>
+          </div>
+          <div>
+            <strong>clipping</strong>
+            <span>The simple mechanism PPO uses to approximate a trust-region idea: improve the policy without taking a huge step.</span>
+          </div>
+        </div>
         <div class="plain-equation">
           <span class="eq-caption">PPO ratio</span>
           <span class="eq-main">ratio<sub>t</sub> = π<sub>new</sub>(a<sub>t</sub> | s<sub>t</sub>) / π<sub>old</sub>(a<sub>t</sub> | s<sub>t</sub>)</span>
@@ -2397,6 +2430,16 @@ gamma Phi(s_2) - Phi(s_1)</div>
           <span class="math-inline">0.24</span>, then <span class="math-inline">ratio = 1.2</span>. The new policy
           made that action 20% more likely.
         </p>
+        <div class="worked">
+          <h4>Why PPO Needs A Ratio At All</h4>
+          <p>
+            The batch was collected by <span class="math-inline">π<sub>old</sub></span>, but while training we are
+            changing the actor into <span class="math-inline">π<sub>new</sub></span>. The ratio tells us how much
+            the new policy agrees with the old policy about the sampled action. If the ratio gets far from
+            <span class="math-inline">1</span>, the batch is becoming less representative of the policy we are
+            currently training.
+          </p>
+        </div>
         <div class="worked">
           <h4>What Clipping Does</h4>
           <div class="component-list">
@@ -2426,6 +2469,15 @@ gamma Phi(s_2) - Phi(s_1)</div>
           <p>
             The takeaway: PPO still does actor-critic policy gradient, but it limits how aggressively the new actor
             can change on the sampled batch.
+          </p>
+        </div>
+        <div class="worked">
+          <h4>Why This Is More Than Clipping</h4>
+          <p>
+            The clipped objective only controls the actor step. A full PPO implementation usually also includes a
+            value-function loss for the critic, an entropy bonus to encourage exploration, advantage normalization,
+            and multiple minibatch epochs over the latest rollout batch. For the exam, the central concept is:
+            PPO is an on-policy actor-critic method that reuses a fresh batch a little while limiting policy drift.
           </p>
         </div>
 
