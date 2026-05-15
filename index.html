@@ -2649,6 +2649,27 @@ gamma Phi(s_2) - Phi(s_1)</div>
         </div>
 
         <h3>Q-Learning Target And Loss</h3>
+        <p>
+          The Greek letter is <span class="math-inline">φ</span>, pronounced "phi." Here it is not a new RL concept.
+          It just names the weights of the Q-network. Earlier, <span class="math-inline">θ</span> was often used for
+          policy-network weights; here <span class="math-inline">φ</span> is used for Q-network weights so we can
+          tell the two networks apart.
+        </p>
+        <div class="worked">
+          <h4>What Data Point i Means</h4>
+          <p>
+            One replay-buffer data point is:
+          </p>
+          <div class="plain-equation">
+            <span class="eq-main">(s<sub>i</sub>, a<sub>i</sub>, r<sub>i</sub>, s'<sub>i</sub>)</span>
+          </div>
+          <div class="component-list">
+            <div><strong>s<sub>i</sub></strong><span>The state in example <span class="math-inline">i</span>.</span></div>
+            <div><strong>a<sub>i</sub></strong><span>The action taken in that state.</span></div>
+            <div><strong>r<sub>i</sub></strong><span>The immediate reward received.</span></div>
+            <div><strong>s'<sub>i</sub></strong><span>The next state. The prime mark means "next."</span></div>
+          </div>
+        </div>
         <div class="plain-equation">
           <span class="eq-caption">1-step Q-learning target</span>
           <span class="eq-main">y<sub>i</sub> = r<sub>i</sub> + γ max<sub>a'</sub> Q̂<sub>φ</sub>(s'<sub>i</sub>, a')</span>
@@ -2663,6 +2684,20 @@ gamma Phi(s_2) - Phi(s_1)</div>
             <span class="math-inline">r=2</span>, <span class="math-inline">γ=0.9</span>, best next Q is
             <span class="math-inline">10</span>, so <span class="math-inline">y = 2 + 0.9·10 = 11</span>.
           </p>
+          <div class="component-list">
+            <div>
+              <strong>Q̂<sub>φ</sub>(s,a)</strong>
+              <span>The Q-network's current prediction for how good action <span class="math-inline">a</span> is in state <span class="math-inline">s</span>.</span>
+            </div>
+            <div>
+              <strong>max<sub>a'</sub> Q̂<sub>φ</sub>(s'<sub>i</sub>, a')</strong>
+              <span>Look at the next state, try every possible next action in the Q-network, and take the largest predicted value.</span>
+            </div>
+            <div>
+              <strong>y<sub>i</sub></strong>
+              <span>The target label: what we want the Q-network's prediction for <span class="math-inline">(s<sub>i</sub>,a<sub>i</sub>)</span> to move toward.</span>
+            </div>
+          </div>
         </div>
         <div class="worked">
           <h4>Why There Is A Loss</h4>
@@ -2679,6 +2714,22 @@ gamma Phi(s_2) - Phi(s_1)</div>
           <p>
             <span class="math-inline">φ</span> is just the Q-network's weights, the same way
             <span class="math-inline">θ</span> is often the policy network's weights.
+          </p>
+        </div>
+        <div class="worked">
+          <h4>One Full Numeric Loss Example</h4>
+          <p>
+            Suppose the current Q-network predicts
+            <span class="math-inline">Q̂<sub>φ</sub>(s<sub>i</sub>,a<sub>i</sub>) = 7</span>, but the target from the
+            Bellman backup is <span class="math-inline">y<sub>i</sub> = 11</span>. The squared error for this one
+            example is:
+          </p>
+          <div class="plain-equation">
+            <span class="eq-main">(prediction - target)<sup>2</sup> = (7 - 11)<sup>2</sup> = 16</span>
+          </div>
+          <p>
+            Training changes <span class="math-inline">φ</span> so the prediction
+            <span class="math-inline">7</span> moves closer to the target <span class="math-inline">11</span>.
           </p>
         </div>
         <p>
