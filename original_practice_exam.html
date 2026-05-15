@@ -234,6 +234,7 @@
           <li>IQL avoids an explicit <span class="math">max<sub>a</sub>Q(s,a)</span> over unseen actions by using a learned <span class="math">V(s)</span> in the target.</li>
           <li>In RLHF, the reward model is usually the final deployed model.</li>
           <li>A KL penalty in RLHF discourages the updated policy from drifting too far from a reference model.</li>
+          <li>DPO directly updates the policy from preferred-versus-rejected response pairs, using a reference model instead of an explicit reward-model-plus-RL loop.</li>
         </ol>
       </div>
     </section>
@@ -374,7 +375,7 @@
       </details>
 
       <details class="answer"><summary>6. Offline RL, IQL, And RLHF</summary>
-        <p>Correct: A, B, C, D, and F. E is false: the reward model is usually a training-time scoring model, while the updated language model is deployed.</p>
+        <p>Correct: A, B, C, D, F, and G. E is false: the reward model is usually a training-time scoring model, while the updated language model is deployed.</p>
       </details>
 
       <details class="answer"><summary>7. Discounted Returns</summary>

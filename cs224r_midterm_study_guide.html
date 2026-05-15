@@ -3445,6 +3445,45 @@ gamma Phi(s_2) - Phi(s_1)</div>
           It turns preference data directly into a classification-style objective for the policy. The lecture frames
           it as simpler and effective, but less able to leverage online data.
         </p>
+        <div class="plain-equation">
+          <span class="eq-caption">DPO objective idea</span>
+          <span class="eq-main">max<sub>θ</sub> E[ log sigmoid( β[(log π<sub>θ</sub>(τ<sub>w</sub>) - log π<sub>ref</sub>(τ<sub>w</sub>)) - (log π<sub>θ</sub>(τ<sub>l</sub>) - log π<sub>ref</sub>(τ<sub>l</sub>))] ) ]</span>
+        </div>
+        <div class="worked">
+          <h4>How To Read The DPO Math</h4>
+          <p>
+            You probably do not need to re-derive DPO from the RLHF objective under exam pressure, but you should
+            be able to read the formula. DPO asks: compared with the reference model, does the new model increase
+            the preferred response more than it increases the rejected response?
+          </p>
+          <div class="component-list">
+            <div>
+              <strong>τ<sub>w</sub></strong>
+              <span>The preferred response from the human preference pair.</span>
+            </div>
+            <div>
+              <strong>τ<sub>l</sub></strong>
+              <span>The rejected response from the same pair.</span>
+            </div>
+            <div>
+              <strong>log π<sub>θ</sub>(τ)</strong>
+              <span>How likely the trainable model currently thinks response <span class="math-inline">τ</span> is.</span>
+            </div>
+            <div>
+              <strong>log π<sub>ref</sub>(τ)</strong>
+              <span>How likely the frozen reference model thinks that response is. Subtracting this keeps the update relative to the original model.</span>
+            </div>
+            <div>
+              <strong>β</strong>
+              <span>A temperature / strength knob. Larger <span class="math-inline">β</span> makes the preference comparison sharper.</span>
+            </div>
+          </div>
+          <p>
+            Plain English: DPO increases the trainable model's relative log-probability of the preferred response
+            and decreases its relative log-probability of the rejected response. It bakes the reward-model-plus-KL
+            idea into one supervised-looking preference loss.
+          </p>
+        </div>
         <div class="note">
           DPO is still preference learning. The practical difference is where the preference signal goes: RLHF first
           trains a reward model and then optimizes the policy against it; DPO updates the policy directly from
