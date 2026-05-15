@@ -1975,11 +1975,17 @@ gamma Phi(s_2) - Phi(s_1)</div>
           future return:
         </p>
         <div class="plain-equation">
-          <span class="eq-caption">With causality and baseline</span>
-          <span class="eq-main">∇<sub>θ</sub>J(θ) = E[ Σ<sub>t</sub> ∇<sub>θ</sub> log π<sub>θ</sub>(a<sub>t</sub> | s<sub>t</sub>) (Σ<sub>t'=t</sub><sup>T</sup> r<sub>t'</sub> - b) ]</span>
-          <span class="eq-caption">Each action is multiplied by future rewards only, minus a baseline.</span>
+          <span class="eq-caption">REINFORCE with reward-to-go and a baseline</span>
+          <span class="eq-main">∇<sub>θ</sub>J(θ) = E<sub>τ ~ p<sub>θ</sub>(τ)</sub>[ Σ<sub>t=1</sub><sup>T</sup> ∇<sub>θ</sub> log π<sub>θ</sub>(a<sub>t</sub> | s<sub>t</sub>) (G<sub>t</sub> - b(s<sub>t</sub>)) ]</span>
+          <span class="eq-main">G<sub>t</sub> = Σ<sub>t'=t</sub><sup>T</sup> r<sub>t'</sub></span>
+          <span class="eq-caption">Each action gets credit for future reward after that action, then subtracts what was expected in that state.</span>
         </div>
-        <p>This keeps the expected gradient correct and usually reduces variance.</p>
+        <p>
+          This is still REINFORCE. It is the same policy-gradient idea, but with two variance-reduction changes:
+          use <span class="math-inline">G<sub>t</sub></span> instead of the whole trajectory return, and subtract a
+          baseline <span class="math-inline">b(s<sub>t</sub>)</span>. If the baseline does not depend on the sampled
+          action, the expected gradient stays correct.
+        </p>
         <div class="worked">
           <h4>Why Reward-To-Go Makes Sense</h4>
           <p>
@@ -2756,8 +2762,9 @@ gamma Phi(s_2) - Phi(s_1)</div>
           <span class="eq-main">∇p = p∇log p</span>
           <span class="eq-caption">REINFORCE</span>
           <span class="eq-main">E[(Σ<sub>t</sub>∇logπ<sub>θ</sub>(a<sub>t</sub>|s<sub>t</sub>))(Σ<sub>t</sub>r<sub>t</sub>)]</span>
-          <span class="eq-caption">Causality + baseline</span>
-          <span class="eq-main">E[Σ<sub>t</sub>∇logπ<sub>θ</sub>(a<sub>t</sub>|s<sub>t</sub>)(Σ<sub>t'=t</sub><sup>T</sup>r<sub>t'</sub>-b)]</span>
+          <span class="eq-caption">REINFORCE with reward-to-go + baseline</span>
+          <span class="eq-main">E[Σ<sub>t=1</sub><sup>T</sup>∇logπ<sub>θ</sub>(a<sub>t</sub>|s<sub>t</sub>)(G<sub>t</sub>-b(s<sub>t</sub>))]</span>
+          <span class="eq-main">G<sub>t</sub> = Σ<sub>t'=t</sub><sup>T</sup>r<sub>t'</sub></span>
         </div>
         <p>Use to reason about credit assignment, baselines, and why dynamics terms vanish.</p>
 
