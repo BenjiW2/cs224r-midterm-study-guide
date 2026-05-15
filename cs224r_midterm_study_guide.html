@@ -1817,7 +1817,8 @@ gamma Phi(s_2) - Phi(s_1)</div>
             <div class="case-card">
               <h5>3. Flow matching loss: train the neural net to point the right way</h5>
               <div class="plain-equation">
-                <span class="eq-main">L<sub>FM</sub>(θ) = average || v<sub>θ</sub>(s<sub>t</sub>, a<sub>t,τ</sub>, τ) - (a<sub>t</sub> - a<sub>t,0</sub>) ||<sup>2</sup></span>
+                <span class="eq-main">L<sub>FM</sub>(θ) = (1 / |D|) Σ<sub>(s<sub>t</sub>,a<sub>t</sub>)∈D</sub> || v<sub>θ</sub>(s<sub>t</sub>, a<sub>t,τ</sub>, τ) - (a<sub>t</sub> - a<sub>t,0</sub>) ||<sup>2</sup></span>
+                <span class="eq-caption">This is the dataset average of the squared prediction error.</span>
               </div>
               <p>
                 The target direction is <span class="math-inline">a<sub>t</sub> - a<sub>t,0</sub></span>: the vector
