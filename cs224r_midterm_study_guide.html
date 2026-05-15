@@ -2264,38 +2264,94 @@ gamma Phi(s_2) - Phi(s_1)</div>
 
         <h3>GAE</h3>
         <p>
-          Generalized advantage estimation averages advantage estimates with different horizons.
-          Short horizons have lower variance but more bootstrap bias. Long horizons have lower bootstrap bias
-          but more rollout variance. GAE blends them with weights controlled by <code>lambda</code>.
+          GAE means <strong>generalized advantage estimation</strong>. Its job is to produce the
+          <span class="math-inline">Â</span> numbers used in the actor update. It is not a new policy-gradient
+          objective; it is a practical way to estimate advantage with a bias/variance tradeoff.
         </p>
         <div class="plain-equation">
           <span class="eq-caption">n-step advantage</span>
-          <span class="eq-main">Â<sub>n</sub>(s<sub>t</sub>,a<sub>t</sub>) = Σ<sub>t'=t</sub><sup>t+n</sup> γ<sup>t'-t</sup>r<sub>t'</sub> - V̂(s<sub>t</sub>) + γ<sup>n</sup>V̂(s<sub>t+n</sub>)</span>
+          <span class="eq-main">Â<sub>n</sub>(s<sub>t</sub>,a<sub>t</sub>) = [Σ<sub>k=0</sub><sup>n-1</sup> γ<sup>k</sup>r<sub>t+k</sub> + γ<sup>n</sup>V̂(s<sub>t+n</sub>)] - V̂(s<sub>t</sub>)</span>
           <span class="eq-caption">GAE blends these n-step estimates with weights proportional to λ<sup>n-1</sup>.</span>
+        </div>
+        <div class="worked">
+          <h4>What GAE Is Blending</h4>
+          <p>
+            A 1-step advantage uses one real reward, then trusts the value network:
+            <span class="math-inline">r<sub>t</sub> + γV̂(s<sub>t+1</sub>) - V̂(s<sub>t</sub>)</span>.
+            A longer-horizon advantage uses more real rewards before trusting the value network. GAE averages
+            those choices instead of forcing you to pick only one.
+          </p>
+          <div class="component-list">
+            <div>
+              <strong>λ close to 0</strong>
+              <span>Mostly 1-step TD advantage. Lower variance, but more bias if the value network is wrong.</span>
+            </div>
+            <div>
+              <strong>λ close to 1</strong>
+              <span>More like Monte Carlo advantage. Less bootstrap bias, but noisier because it depends on more rollout rewards.</span>
+            </div>
+            <div>
+              <strong>Exam translation</strong>
+              <span>GAE is a knob between short, stable, biased estimates and long, noisy, less biased estimates.</span>
+            </div>
+          </div>
+        </div>
+        <div class="worked">
+          <h4>Small GAE Picture</h4>
+          <p>
+            Suppose an action is followed by rewards over time. A 1-step estimate asks, "after one reward, what
+            does the critic think?" A 5-step estimate asks, "after five real rewards, what does the critic think?"
+            GAE combines these estimates so one weird reward or one bad value prediction does not completely decide
+            the update.
+          </p>
         </div>
 
         <h3>PPO</h3>
         <p>
-          PPO lets you take multiple gradient steps on a batch while preventing the new policy from moving too far.
-          It does this by clipping the importance ratio.
+          PPO means <strong>proximal policy optimization</strong>. "Proximal" means "nearby." PPO tries to improve
+          the policy while keeping the new policy close to the old policy that collected the data.
         </p>
         <div class="plain-equation">
           <span class="eq-caption">PPO ratio</span>
-          <span class="eq-main">r<sub>t</sub>(θ') = π<sub>θ'</sub>(a<sub>t</sub> | s<sub>t</sub>) / π<sub>θ</sub>(a<sub>t</sub> | s<sub>t</sub>)</span>
+          <span class="eq-main">ratio<sub>t</sub> = π<sub>new</sub>(a<sub>t</sub> | s<sub>t</sub>) / π<sub>old</sub>(a<sub>t</sub> | s<sub>t</sub>)</span>
           <span class="eq-caption">PPO clipped surrogate</span>
-          <span class="eq-main">Σ<sub>i,t</sub> min( r<sub>t</sub>(θ')Â<sub>t</sub>, clip(r<sub>t</sub>(θ'), 1-ε, 1+ε)Â<sub>t</sub> )</span>
+          <span class="eq-main">Σ<sub>i,t</sub> min( ratio<sub>t</sub>Â<sub>t</sub>, clip(ratio<sub>t</sub>, 1-ε, 1+ε)Â<sub>t</sub> )</span>
         </div>
         <p>
-          If an update would make the policy probability change too much in a way that improves the surrogate,
-          clipping removes the extra incentive.
+          The ratio measures how much the policy changed on the action that was actually sampled. If the old policy
+          gave the sampled action probability <span class="math-inline">0.20</span> and the new policy gives it
+          <span class="math-inline">0.24</span>, then <span class="math-inline">ratio = 1.2</span>. The new policy
+          made that action 20% more likely.
         </p>
         <div class="worked">
-          <h4>PPO Clipping Intuition</h4>
+          <h4>What Clipping Does</h4>
+          <div class="component-list">
+            <div>
+              <strong>Â<sub>t</sub> &gt; 0</strong>
+              <span>The sampled action was good. PPO wants to increase its probability, but stops rewarding increases past about <span class="math-inline">1+ε</span>.</span>
+            </div>
+            <div>
+              <strong>Â<sub>t</sub> &lt; 0</strong>
+              <span>The sampled action was bad. PPO wants to decrease its probability, but stops rewarding decreases past about <span class="math-inline">1-ε</span>.</span>
+            </div>
+            <div>
+              <strong>Why</strong>
+              <span>Without clipping, one batch could push the new policy far away from the old policy, making the data less trustworthy.</span>
+            </div>
+          </div>
+        </div>
+        <div class="worked">
+          <h4>PPO Numeric Example</h4>
           <p>
-            The ratio compares the new policy to the old policy on the same sampled action. If the ratio is
-            <span class="math-inline">1.0</span>, probability did not change. If it is <span class="math-inline">1.2</span>,
-            the new policy made that action 20% more likely. PPO says: learn from the batch, but do not let one
-            update make the new policy too different from the policy that collected the data.
+            Let <span class="math-inline">ε=0.2</span>, so PPO clips ratios to the range
+            <span class="math-inline">[0.8, 1.2]</span>. If <span class="math-inline">Â=3</span> and the ratio is
+            <span class="math-inline">1.5</span>, unclipped improvement is <span class="math-inline">1.5·3=4.5</span>,
+            but clipped improvement is <span class="math-inline">1.2·3=3.6</span>. PPO uses the smaller useful
+            value, so there is no extra reward for pushing the probability even higher.
+          </p>
+          <p>
+            The takeaway: PPO still does actor-critic policy gradient, but it limits how aggressively the new actor
+            can change on the sampled batch.
           </p>
         </div>
 
