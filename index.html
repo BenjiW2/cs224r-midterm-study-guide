@@ -3317,6 +3317,33 @@ gamma Phi(s_2) - Phi(s_1)</div>
             preferred. If the human preferred B, the loss pushes the reward model to lower A's score or raise B's.
           </p>
         </div>
+        <div class="worked">
+          <h4>What Sigmoid Means Here</h4>
+          <p>
+            <span class="math-inline">sigmoid(z)</span> is a function that turns any real number
+            <span class="math-inline">z</span> into a probability between <span class="math-inline">0</span> and
+            <span class="math-inline">1</span>. In this formula, the input is the reward-score difference:
+            <span class="math-inline">z = r<sub>θ</sub>(τ<sub>w</sub>) - r<sub>θ</sub>(τ<sub>l</sub>)</span>.
+          </p>
+          <div class="component-list">
+            <div>
+              <strong>z = 0</strong>
+              <span>The two trajectories have equal reward score. Sigmoid gives <span class="math-inline">0.5</span>: the model is unsure.</span>
+            </div>
+            <div>
+              <strong>z is positive</strong>
+              <span>The winner has higher reward score than the loser. Sigmoid gives a probability above <span class="math-inline">0.5</span>.</span>
+            </div>
+            <div>
+              <strong>z is very positive</strong>
+              <span>The winner's score is much higher. Sigmoid gets close to <span class="math-inline">1</span>: the model is very confident the winner should be preferred.</span>
+            </div>
+            <div>
+              <strong>z is negative</strong>
+              <span>The model currently scores the loser higher. Sigmoid gives a probability below <span class="math-inline">0.5</span>, so training pushes the reward model to fix that.</span>
+            </div>
+          </div>
+        </div>
         <div class="component-list">
           <div><strong>τ<sub>w</sub></strong><span>The winning trajectory, response, or completion preferred by the human.</span></div>
           <div><strong>τ<sub>l</sub></strong><span>The losing trajectory, response, or completion.</span></div>
